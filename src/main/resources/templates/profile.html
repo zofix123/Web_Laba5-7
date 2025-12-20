@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<h2>Личный кабинет</h2>
+
+<p th:text="'Имя: ' + ${session.user.name}"></p>
+<p th:text="'Email: ' + ${session.user.email}"></p>
+
+<a th:href="@{/}">На главную</a>
+<br>
+<a th:href="@{/logout}">Выйти</a>
+
+</body>
+</html>
