@@ -3,7 +3,7 @@
 <body>
 
 <div style="text-align: right; color: gray; font-size: 0.9em;">
-  Текущее время сервера: <span th:text="${serverTime}"></span>
+  Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
 </div>
 
 <h2>Вход</h2>
@@ -28,5 +28,6 @@
 <br>
 <a th:href="@{/register}">Регистрация</a>
 
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>
