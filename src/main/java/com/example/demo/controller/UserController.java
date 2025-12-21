@@ -24,6 +24,7 @@ public class UserController {
 
     //Получение всех сущностей
     @GetMapping
+    @ResponseBody
     public List<User> findAll() {
         return userService.findAll();
     }
@@ -37,20 +38,26 @@ public class UserController {
             User saved = userService.create(user);
             session.setAttribute("user", saved);
             return "redirect:/profile";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException | EmailAlreadyExistsException e) {
+            // Сохраняем введенные данные для повторного заполнения формы
+            model.addAttribute("name", user.getName());
+            model.addAttribute("email", user.getEmail());
+            model.addAttribute("birth", user.getBirth());
             model.addAttribute("error", "Пользователь с такой почтой уже существует");
-            return "register";
+            return "register"; // возвращаем на страницу регистрации с ошибкой
         }
     }
 
     //Удаление сущности
     @DeleteMapping(path = "{id}")
+    @ResponseBody
     public void delete(@PathVariable Long id) {
         userService.delete(id);
     }
 
     //Возможность обновления емейла и имени сущности
     @PutMapping(path = "{id}")
+    @ResponseBody
     public void update(@PathVariable Long id,
                        @RequestParam(required = false) String email,
                        @RequestParam(required = false) String name) {
