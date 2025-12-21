@@ -1,15 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Личный кабинет</title>
+</head>
 <body>
 
-<h2>Личный кабинет</h2>
+<!-- Проверяем, авторизован ли пользователь -->
+<div th:if="${session.user == null}">
+    <h2>Вы не авторизованы</h2>
+    <p>Пожалуйста, <a th:href="@{/users/login}">войдите</a> или <a th:href="@{/users/register}">зарегистрируйтесь</a>.</p>
+</div>
 
-<p th:text="'Имя: ' + ${session.user.name}"></p>
-<p th:text="'Email: ' + ${session.user.email}"></p>
+<div th:if="${session.user != null}">
+    <h2>Личный кабинет</h2>
 
-<a th:href="@{/}">На главную</a>
-<br>
-<a th:href="@{/logout}">Выйти</a>
+    <p><strong>Имя:</strong> <span th:text="${session.user.name}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${session.user.email}"></span></p>
+    <p><strong>Дата рождения:</strong> <span th:text="${session.user.birth}"></span></p>
+    <p><strong>Возраст:</strong> <span th:text="${session.user.age}"></span> лет</p>
+
+    <!-- отображение счетчика посещений -->
+    <p><strong>Количество посещений:</strong>
+        <span th:text="${session.user.visitCount}"></span>
+    </p>
+
+
+    <br>
+    <a th:href="@{/}">На главную</a>
+    <br>
+    <a th:href="@{/users/logout}">Выйти</a>
+</div>
 
 </body>
 </html>

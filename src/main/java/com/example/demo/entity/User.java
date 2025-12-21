@@ -17,6 +17,7 @@ public class User {
     private String email;
     private LocalDate birth;
     private int age;
+    private int visitCount = 1;
 
     public User(){}
 
@@ -68,6 +69,21 @@ public class User {
         this.age = age;
     }
 
+    public int getVisitCount() {
+        return visitCount;
+    }
+
+    public void setVisitCount(int visitCount) {
+        this.visitCount = visitCount;
+    }
+
+    // Увеличить счетчик на 1
+    public void incrementVisitCount() {
+        this.visitCount++;
+    }
+
+
+
     @Override
     public String toString() {
         return "User{" +
@@ -76,6 +92,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", birth=" + birth +
                 ", age=" + age +
+                ", visitCount=" + visitCount +
                 '}';
     }
 }

@@ -4,12 +4,21 @@
 
 <h2>Вход</h2>
 
-<form method="post">
-  <input type="email" placeholder="Email">
+<!-- Сообщение об ошибке, если есть -->
+<p th:if="${error}" th:text="${error}" style="color:red"></p>
+
+<!-- Форма входа - отправляет на /users/login -->
+<form th:action="@{/users/login}" method="post">
+  <input type="email" name="email" placeholder="Email" required
+         th:value="${email != null ? email : ''}">
+  <br><br>
   <button type="submit">Войти</button>
 </form>
 
+<br>
 <a th:href="@{/}">На главную</a>
+<br>
+<a th:href="@{/register}">Регистрация</a>
 
 </body>
 </html>

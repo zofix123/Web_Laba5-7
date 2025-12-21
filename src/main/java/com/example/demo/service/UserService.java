@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -18,6 +19,7 @@ public class UserService {
     }
 
     private final UserRepository userRepository;
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -59,5 +61,30 @@ public class UserService {
         if (name != null && !name.equals(user.getName())) {
             user.setName(name);
         }
+    }
+
+    //  Поиск пользователя по email
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    // метод для увеличения счетчика посещений
+    @Transactional
+    public User incrementVisitCount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        user.incrementVisitCount(); // увеличиваем счетчик
+        return userRepository.save(user); // сохраняем изменения
+    }
+
+    // метод для получения пользователя с увеличением счетчика
+    @Transactional
+    public User getAndIncrementVisitCount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        user.incrementVisitCount(); // увеличиваем счетчик
+        return userRepository.save(user); // сохраняем и возвращаем
     }
 }
