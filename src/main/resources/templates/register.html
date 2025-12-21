@@ -7,9 +7,12 @@
 <p th:if="${error}" th:text="${error}" style="color:red"></p>
 
 <form th:action="@{/users/create}" method="post">
-  <input type="text" name="name" placeholder="Имя" required><br>
-  <input type="email" name="email" placeholder="Email" required><br>
-  <input type="date" name="birth" required><br>
+  <input type="text" name="name" placeholder="Имя" required
+         th:value="${name != null ? name : ''}"><br>
+  <input type="email" name="email" placeholder="Email" required
+         th:value="${email != null ? email : ''}"><br>
+  <input type="date" name="birth" required
+         th:value="${birth != null ? birth : ''}"><br>
 
   <button type="submit">Зарегистрироваться</button>
 </form>
