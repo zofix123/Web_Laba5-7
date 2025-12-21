@@ -7,9 +7,22 @@
 
 <h1>Добро пожаловать на сайт знакомств</h1>
 
-<a th:href="@{/register}">Регистрация</a>
-<br>
-<a th:href="@{/login}">Вход</a>
+<div th:if="${session.user == null}">
+    <p>Вы не авторизованы</p>
+    <a th:href="@{/users/register}">Регистрация</a>
+    <br>
+    <a th:href="@{/users/login}">Вход</a>
+</div>
+
+<div th:if="${session.user != null}">
+    <h2>Добро пожаловать, <span th:text="${session.user.name}"></span>!</h2>
+
+    <p>Ваш счетчик посещений: <strong th:text="${session.user.visitCount}"></strong></p>
+
+    <a th:href="@{/profile}">Личный кабинет</a>
+    <br>
+    <a th:href="@{/users/logout}">Выйти</a>
+</div>
 
 </body>
 </html>
