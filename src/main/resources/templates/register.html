@@ -2,20 +2,105 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+  Текущее время сервера: <span th:text="${serverTime}"></span>
+</div>
+
 <h2>Регистрация</h2>
 
 <p th:if="${error}" th:text="${error}" style="color:red"></p>
+<p th:if="${success}" th:text="${success}" style="color:green"></p>
 
-<form th:action="@{/users/create}" method="post">
+<form th:action="@{/users/create}" method="post" onsubmit="return validatePassword()">
   <input type="text" name="name" placeholder="Имя" required
          th:value="${name != null ? name : ''}"><br>
   <input type="email" name="email" placeholder="Email" required
          th:value="${email != null ? email : ''}"><br>
+  <input type="password" id="password" name="password" placeholder="Пароль (мин. 4 символа)" required
+         minlength="4" oninput="checkPasswordStrength()"><br>
+  <div id="password-strength" style="font-size: 0.8em; margin-bottom: 5px;"></div>
+
+  <input type="password" id="confirmPassword" name="confirmPassword"
+         placeholder="Повторите пароль" required
+         minlength="4"><br>
+  <div id="password-match" style="font-size: 0.8em; margin-bottom: 10px;"></div>
+
   <input type="date" name="birth" required
-         th:value="${birth != null ? birth : ''}"><br>
+         th:value="${birth != null ? birth : ''}"><br><br>
 
   <button type="submit">Зарегистрироваться</button>
 </form>
+
+<script>
+  function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthDiv = document.getElementById('password-strength');
+
+    if (password.length === 0) {
+      strengthDiv.innerHTML = '';
+      return;
+    }
+
+    if (password.length < 4) {
+      strengthDiv.innerHTML = 'Слишком короткий пароль (минимум 4 символа)';
+      strengthDiv.style.color = 'red';
+    } else if (password.length < 6) {
+      strengthDiv.innerHTML = 'Слабый пароль';
+      strengthDiv.style.color = 'orange';
+    } else if (password.length < 8) {
+      strengthDiv.innerHTML = 'Средний пароль';
+      strengthDiv.style.color = 'blue';
+    } else {
+      strengthDiv.innerHTML = 'Надежный пароль';
+      strengthDiv.style.color = 'green';
+    }
+  }
+
+  function validatePassword() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const matchDiv = document.getElementById('password-match');
+
+    // Проверка длины пароля
+    if (password.length < 4) {
+      matchDiv.innerHTML = 'Пароль должен содержать минимум 4 символа';
+      matchDiv.style.color = 'red';
+      return false;
+    }
+
+    // Проверка совпадения паролей
+    if (password !== confirmPassword) {
+      matchDiv.innerHTML = 'Пароли не совпадают';
+      matchDiv.style.color = 'red';
+      return false;
+    } else {
+      matchDiv.innerHTML = 'Пароли совпадают ✓';
+      matchDiv.style.color = 'green';
+    }
+
+    return true;
+  }
+
+  // Проверка совпадения паролей в реальном времени
+  document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    const matchDiv = document.getElementById('password-match');
+
+    if (confirmPassword.length === 0) {
+      matchDiv.innerHTML = '';
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      matchDiv.innerHTML = 'Пароли не совпадают';
+      matchDiv.style.color = 'red';
+    } else {
+      matchDiv.innerHTML = 'Пароли совпадают ✓';
+      matchDiv.style.color = 'green';
+    }
+  });
+</script>
 
 <br>
 <a th:href="@{/}">На главную</a>

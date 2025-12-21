@@ -18,6 +18,8 @@ public class User {
     private LocalDate birth;
     private int age;
     private int visitCount = 1;
+    @Column(nullable = false)
+    private String password;
 
     public User(){}
 
@@ -27,6 +29,7 @@ public class User {
         this.email = email;
         this.birth = birth;
         this.age = age;
+        this.password = password;
     }
 
     public long getId() {
@@ -82,6 +85,14 @@ public class User {
         this.visitCount++;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 
 
     @Override
@@ -93,6 +104,7 @@ public class User {
                 ", birth=" + birth +
                 ", age=" + age +
                 ", visitCount=" + visitCount +
+                ", password='" + password + '\'' +
                 '}';
     }
 }

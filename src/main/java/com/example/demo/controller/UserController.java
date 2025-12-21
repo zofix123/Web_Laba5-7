@@ -30,20 +30,56 @@ public class UserController {
     }
 
     // POST для обработки регистрации
+    // POST для обработки регистрации с проверкой пароля
     @PostMapping("/create")
-    public String create(User user,
+    public String create(@RequestParam String name,
+                         @RequestParam String email,
+                         @RequestParam String password,
+                         @RequestParam String confirmPassword, // Подтверждение пароля
+                         @RequestParam String birth,
                          HttpSession session,
                          Model model) {
+
+        // Проверка длины пароля
+        if (password.length() < 4) {
+            model.addAttribute("name", name);
+            model.addAttribute("email", email);
+            model.addAttribute("birth", birth);
+            model.addAttribute("error", "Пароль должен содержать минимум 4 символа");
+            return "register";
+        }
+
+        // Проверка совпадения паролей
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("name", name);
+            model.addAttribute("email", email);
+            model.addAttribute("birth", birth);
+            model.addAttribute("error", "Пароли не совпадают");
+            return "register";
+        }
+
         try {
+            // Создание пользователя
+            User user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setBirth(java.time.LocalDate.parse(birth));
+
             User saved = userService.create(user);
-            // При регистрации счетчик = 0 (по умолчанию)
             session.setAttribute("user", saved);
             return "redirect:/profile";
         } catch (DataIntegrityViolationException | EmailAlreadyExistsException e) {
-            model.addAttribute("name", user.getName());
-            model.addAttribute("email", user.getEmail());
-            model.addAttribute("birth", user.getBirth());
+            model.addAttribute("name", name);
+            model.addAttribute("email", email);
+            model.addAttribute("birth", birth);
             model.addAttribute("error", "Пользователь с такой почтой уже существует");
+            return "register";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("name", name);
+            model.addAttribute("email", email);
+            model.addAttribute("birth", birth);
+            model.addAttribute("error", e.getMessage());
             return "register";
         }
     }
@@ -57,23 +93,60 @@ public class UserController {
     // Post Вход пользователя
     @PostMapping("/login")
     public String login(@RequestParam String email,
+                        @RequestParam String password, // Добавлен параметр пароля
                         HttpSession session,
                         Model model) {
         Optional<User> userOptional = userService.findByEmail(email);
 
         if (userOptional.isPresent()) {
-            // Пользователь найден - сохраняем в сессию
             User user = userOptional.get();
-            // Инкремент счетчика посещений
-            user = userService.incrementVisitCount(user.getId());
-            session.setAttribute("user", user);
-            return "redirect:/profile";
+
+            // Проверка пароля
+            if (user.getPassword() != null && password.equals(user.getPassword())) {
+                // Пароль верный - инкремент счетчика и вход
+                user = userService.incrementVisitCount(user.getId());
+                session.setAttribute("user", user);
+                return "redirect:/profile";
+            } else {
+                // Неверный пароль
+                model.addAttribute("error", "Неверный пароль");
+                model.addAttribute("email", email); // сохранение введенного email
+                return "login"; // возврат на страницу входа с ошибкой
+            }
         } else {
             // Пользователь не найден
             model.addAttribute("error", "Пользователь с таким email не найден");
             model.addAttribute("email", email); // сохранение введенного email
-            return "login"; //возврат на страницу входа с ошибкой
+            return "login"; // возврат на страницу входа с ошибкой
         }
+    }
+
+    @GetMapping("/change-password")
+    public String showChangePasswordPage(HttpSession session, Model model) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/users/login";
+        }
+        return "change-password";
+    }
+
+    // Обработка смены пароля
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam Long userId,
+                                 @RequestParam String oldPassword,
+                                 @RequestParam String newPassword,
+                                 @RequestParam String confirmNewPassword,
+                                 HttpSession session,
+                                 Model model) {
+
+        try {
+            User user = userService.changePassword(userId, oldPassword, newPassword, confirmNewPassword);
+            session.setAttribute("user", user);
+            model.addAttribute("success", "Пароль успешно изменен");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+        }
+
+        return "change-password";
     }
 
     // Выход пользователя
@@ -96,8 +169,10 @@ public class UserController {
     @ResponseBody
     public void update(@PathVariable Long id,
                        @RequestParam(required = false) String email,
-                       @RequestParam(required = false) String name) {
-        userService.update(id, email, name);
+                       @RequestParam(required = false) String name,
+                       @RequestParam(required = false) String password,
+                       @RequestParam(required = false) String confirmPassword) {
+        userService.update(id, email, name, password, confirmPassword);
     }
 
     // отдельный эндпоинт для обновления счетчика
