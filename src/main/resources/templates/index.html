@@ -5,6 +5,10 @@
 </head>
 <body>
 
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+    Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
+
 <h1>Добро пожаловать на сайт знакомств</h1>
 
 <div th:if="${session.user == null}">
@@ -24,5 +28,7 @@
     <a th:href="@{/users/logout}">Выйти</a>
 </div>
 
+
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>

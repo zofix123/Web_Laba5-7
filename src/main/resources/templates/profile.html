@@ -5,6 +5,10 @@
 </head>
 <body>
 
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+    Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
+
 <!-- Проверяем, авторизован ли пользователь -->
 <div th:if="${session.user == null}">
     <h2>Вы не авторизованы</h2>
@@ -24,6 +28,10 @@
         <span th:text="${session.user.visitCount}"></span>
     </p>
 
+    <br>
+    <a th:href="@{/users/change-password}">Сменить пароль</a>
+    <br>
+
 
     <br>
     <a th:href="@{/}">На главную</a>
@@ -31,5 +39,6 @@
     <a th:href="@{/users/logout}">Выйти</a>
 </div>
 
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>

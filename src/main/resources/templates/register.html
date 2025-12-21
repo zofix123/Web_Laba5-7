@@ -2,23 +2,38 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+  Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
+
 <h2>Регистрация</h2>
 
 <p th:if="${error}" th:text="${error}" style="color:red"></p>
+<p th:if="${success}" th:text="${success}" style="color:green"></p>
 
-<form th:action="@{/users/create}" method="post">
+<form th:action="@{/users/create}" method="post" onsubmit="return validatePassword()">
   <input type="text" name="name" placeholder="Имя" required
          th:value="${name != null ? name : ''}"><br>
   <input type="email" name="email" placeholder="Email" required
          th:value="${email != null ? email : ''}"><br>
+  <input type="password" id="password" name="password" placeholder="Пароль (мин. 4 символа)" required
+         minlength="4" oninput="checkPasswordStrength()"><br>
+  <div id="password-strength" style="font-size: 0.8em; margin-bottom: 5px;"></div>
+
+  <input type="password" id="confirmPassword" name="confirmPassword"
+         placeholder="Повторите пароль" required
+         minlength="4"><br>
+  <div id="password-match" style="font-size: 0.8em; margin-bottom: 10px;"></div>
+
   <input type="date" name="birth" required
-         th:value="${birth != null ? birth : ''}"><br>
+         th:value="${birth != null ? birth : ''}"><br><br>
 
   <button type="submit">Зарегистрироваться</button>
 </form>
 
 <br>
 <a th:href="@{/}">На главную</a>
-
+<script th:src="@{/js/password_check.js}"></script>
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>

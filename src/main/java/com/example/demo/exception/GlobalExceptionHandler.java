@@ -10,6 +10,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public String handleEmailAlreadyExists(EmailAlreadyExistsException e, Model model) {
         model.addAttribute("error", e.getMessage());
-        return "register"; // вернет на страницу регистрации
+        return "register"; // страница регистрации
     }
 }

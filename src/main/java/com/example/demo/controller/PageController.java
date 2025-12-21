@@ -8,6 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Controller
 @SessionAttributes("user") //для управления сессией
 public class PageController {
@@ -20,6 +23,7 @@ public class PageController {
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
+        addServerTimeToModel(model);
         // Добавляем пользователя в модель, если он есть в сессии
         if (session.getAttribute("user") != null) {
             model.addAttribute("user", session.getAttribute("user"));
@@ -28,17 +32,20 @@ public class PageController {
     }
 
     @GetMapping("/register")
-    public String registerPage() {
+    public String registerPage(Model model) {
+        addServerTimeToModel(model);
         return "register";
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(Model model) {
+        addServerTimeToModel(model);
         return "login";
     }
 
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
+        addServerTimeToModel(model);
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
@@ -49,6 +56,11 @@ public class PageController {
         model.addAttribute("user", user);
 
         return "profile";
+    }
+
+    private void addServerTimeToModel(Model model) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        model.addAttribute("serverTime", sdf.format(new Date()));
     }
 
 }

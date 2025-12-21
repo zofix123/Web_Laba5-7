@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+  Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
+
 <h2>Вход</h2>
 
 <!-- Сообщение об ошибке, если есть -->
@@ -12,6 +16,10 @@
   <input type="email" name="email" placeholder="Email" required
          th:value="${email != null ? email : ''}">
   <br><br>
+
+  <label>Пароль:</label><br>
+  <input type="password" name="password" placeholder="Введите пароль" required><br><br>
+
   <button type="submit">Войти</button>
 </form>
 
@@ -20,5 +28,6 @@
 <br>
 <a th:href="@{/register}">Регистрация</a>
 
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>

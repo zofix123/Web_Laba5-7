@@ -28,6 +28,16 @@ public class UserService {
         if (user.getBirth() == null) {
             throw new IllegalArgumentException("Дата рождения обязательна");
         }
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Пароль обязателен");
+        }
+
+        // Проверка длины пароля
+        if (user.getPassword().length() < 4) {
+            throw new IllegalArgumentException("Пароль должен содержать минимум 4 символа");
+        }
+
         user.setAge(Period.between(user.getBirth(), LocalDate.now()).getYears());
         try {
             return userRepository.save(user);
@@ -45,11 +55,12 @@ public class UserService {
     }
 
     @Transactional
-    public void update(Long id, String email, String name) {
+    public void update(Long id, String email, String name, String password, String confirmPassword) {
         if (!userRepository.existsById(id)) {
             throw new IllegalStateException("юзера с таким id " + id + " не существует");
         }
         User user = userRepository.findById(id).get();
+
         if (email != null && !email.equals(user.getEmail())) {
             try {
                 user.setEmail(email);
@@ -61,6 +72,46 @@ public class UserService {
         if (name != null && !name.equals(user.getName())) {
             user.setName(name);
         }
+        if (password != null && !password.trim().isEmpty()) {
+            // Проверка длины при обновлении
+            if (password.length() < 4) {
+                throw new IllegalArgumentException("Пароль должен содержать минимум 4 символа");
+            }
+            // Проверка совпадения паролей (если передано confirmPassword)
+            if (confirmPassword != null && !password.equals(confirmPassword)) {
+                throw new IllegalArgumentException("Пароли не совпадают");
+            }
+            user.setPassword(password);
+        }
+    }
+
+    @Transactional
+    public User changePassword(Long userId, String oldPassword, String newPassword, String confirmNewPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        // Проверка старого пароля
+        if (!oldPassword.equals(user.getPassword())) {
+            throw new IllegalArgumentException("Неверный старый пароль");
+        }
+
+        // Проверка длины нового пароля
+        if (newPassword.length() < 4) {
+            throw new IllegalArgumentException("Новый пароль должен содержать минимум 4 символа");
+        }
+
+        // Проверка совпадения новых паролей
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new IllegalArgumentException("Новые пароли не совпадают");
+        }
+
+        // Проверка, что новый пароль отличается от старого
+        if (newPassword.equals(oldPassword)) {
+            throw new IllegalArgumentException("Новый пароль должен отличаться от старого");
+        }
+
+        user.setPassword(newPassword);
+        return userRepository.save(user);
     }
 
     //  Поиск пользователя по email
