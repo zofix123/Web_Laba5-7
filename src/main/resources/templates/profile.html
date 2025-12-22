@@ -2,6 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Личный кабинет</title>
+    <style>
+        .avatar-container {
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+        .default-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ddd;
+            font-size: 48px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,6 +42,20 @@
 <div th:if="${session.user != null}">
     <h2>Личный кабинет</h2>
 
+    <!-- Отображение аватара -->
+    <div class="avatar-container">
+        <div th:if="${session.user.avatar != null}">
+            <img th:src="${session.user.avatar}"
+                 alt="Аватар пользователя"
+                 class="avatar">
+        </div>
+        <div th:if="${session.user.avatar == null}" class="default-avatar">
+            👤
+        </div>
+        <br>
+        <a th:href="@{/users/upload-avatar}">Изменить аватар</a>
+    </div>
+
     <p><strong>Имя:</strong> <span th:text="${session.user.name}"></span></p>
     <p><strong>Email:</strong> <span th:text="${session.user.email}"></span></p>
     <p><strong>Дата рождения:</strong> <span th:text="${session.user.birth}"></span></p>
@@ -31,8 +69,6 @@
     <br>
     <a th:href="@{/users/change-password}">Сменить пароль</a>
     <br>
-
-
     <br>
     <a th:href="@{/}">На главную</a>
     <br>

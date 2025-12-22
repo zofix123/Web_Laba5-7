@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -182,5 +184,49 @@ public class UserController {
         User user = userService.incrementVisitCount(userId);
         return "Счетчик посещений пользователя " + user.getName() +
                 " увеличен. Текущее значение: " + user.getVisitCount();
+    }
+
+    // метод для отображения страницы загрузки аватара
+    @GetMapping("/upload-avatar")
+    public String showUploadAvatarPage(HttpSession session, Model model) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/users/login";
+        }
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "upload-avatar";
+    }
+
+    // метод для обработки загрузки аватара
+    @PostMapping("/upload-avatar")
+    public String uploadAvatar(@RequestParam("avatarFile") MultipartFile file,
+                               HttpSession session,
+                               Model model) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/users/login";
+        }
+
+        User sessionUser = (User) session.getAttribute("user");
+
+        try {
+            if (file.isEmpty()) {
+                model.addAttribute("error", "Пожалуйста, выберите файл");
+                return "upload-avatar";
+            }
+
+            // Сохраняем аватар и получаем обновленного пользователя
+            User updatedUser = userService.saveAvatar(sessionUser.getId(), file);
+
+            // Обновляем пользователя в сессии
+            session.setAttribute("user", updatedUser);
+            model.addAttribute("success", "Аватар успешно загружен");
+
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+        } catch (IOException e) {
+            model.addAttribute("error", "Ошибка при сохранении файла: " + e.getMessage());
+        }
+
+        return "upload-avatar";
     }
 }
