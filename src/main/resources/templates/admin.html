@@ -180,6 +180,9 @@
   </style>
 </head>
 <body>
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+  Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
 <div class="container">
   <a href="/profile" class="back-link">← Назад в профиль</a>
 
@@ -354,5 +357,6 @@
   }
 
 </script>
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>
