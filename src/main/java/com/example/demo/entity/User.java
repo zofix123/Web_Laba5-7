@@ -20,6 +20,7 @@ public class User {
     private int visitCount = 1;
     @Column(nullable = false)
     private String password;
+    private String avatar;
 
     public User(){}
 
@@ -93,6 +94,13 @@ public class User {
         this.password = password;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
 
     @Override
@@ -105,6 +113,7 @@ public class User {
                 ", age=" + age +
                 ", visitCount=" + visitCount +
                 ", password='" + password + '\'' +
+                ", avatar='" + avatar + '\'' +
                 '}';
     }
 }
