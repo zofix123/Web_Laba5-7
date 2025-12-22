@@ -69,6 +69,14 @@
     <br>
     <a th:href="@{/users/change-password}">Сменить пароль</a>
     <br>
+
+    <br>
+    <div th:if="${session.user.role == 'admin'}">
+        <a th:href="@{/users/admin}" style="color: #ff6b6b;">Панель администратора</a>
+        <br>
+    </div>
+    <br>
+
     <br>
     <a th:href="@{/}">На главную</a>
     <br>

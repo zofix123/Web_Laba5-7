@@ -10,8 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +34,6 @@ public class UserController {
         return "register";
     }
 
-    // POST для обработки регистрации
     // POST для обработки регистрации с проверкой пароля
     @PostMapping("/create")
     public String create(@RequestParam String name,
@@ -186,6 +188,7 @@ public class UserController {
                 " увеличен. Текущее значение: " + user.getVisitCount();
     }
 
+
     // метод для отображения страницы загрузки аватара
     @GetMapping("/upload-avatar")
     public String showUploadAvatarPage(HttpSession session, Model model) {
@@ -229,4 +232,115 @@ public class UserController {
 
         return "upload-avatar";
     }
+
+    // Страница администратора
+    @GetMapping("/admin")
+    public String adminPage(HttpSession session, Model model) {
+        // Проверяем, является ли пользователь администратором
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+            return "redirect:/profile";
+        }
+
+        List<User> users = userService.getAllUsersSorted();
+        long totalUsers = users.size();
+        long adminCount = users.stream()
+                .filter(u -> "admin".equals(u.getRole()))
+                .count();
+        long moderatorCount = users.stream()
+                .filter(u -> "moderator".equals(u.getRole()))
+                .count();
+        long userCount = users.stream()
+                .filter(u -> "user".equals(u.getRole()))
+                .count();
+
+        model.addAttribute("users", users);
+        model.addAttribute("totalUsers", totalUsers);
+        model.addAttribute("adminCount", adminCount);
+        model.addAttribute("moderatorCount", moderatorCount);
+        model.addAttribute("userCount", userCount);
+
+        return "admin";
+    }
+
+    // Удаление пользователя (администратором)
+    @PostMapping("/admin/delete/{id}")
+    public String deleteUser(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+            return "redirect:/profile";
+        }
+
+        // Нельзя удалить самого себя
+        if (currentUser.getId() == id) {
+            redirectAttributes.addFlashAttribute("error", "Вы не можете удалить свой собственный аккаунт");
+            return "redirect:/users/admin";
+        }
+
+        try {
+            userService.delete(id);
+            redirectAttributes.addFlashAttribute("success", "Пользователь успешно удален");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении пользователя: " + e.getMessage());
+        }
+
+        return "redirect:/users/admin";
+    }
+
+    // Обновление роли пользователя
+    @PostMapping("/admin/update-role/{id}")
+    public String updateUserRole(@PathVariable Long id,
+                                 @RequestParam String role,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+            return "redirect:/profile";
+        }
+
+        // Нельзя изменить свою собственную роль
+        if (currentUser.getId() == id) {
+            redirectAttributes.addFlashAttribute("error", "Вы не можете изменить свою собственную роль");
+            return "redirect:/users/admin";
+        }
+
+        try {
+            userService.updateUserRole(id, role);
+            redirectAttributes.addFlashAttribute("success", "Роль пользователя обновлена");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении роли: " + e.getMessage());
+        }
+
+        return "redirect:/users/admin";
+    }
+
+    // Обновление данных пользователя (администратором)
+    @PostMapping("/admin/update/{id}")
+    public String updateUserByAdmin(@PathVariable Long id,
+                                    @RequestParam(required = false) String name,
+                                    @RequestParam(required = false) String email,
+                                    @RequestParam(required = false) String birth,
+                                    @RequestParam(required = false) String role,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+            return "redirect:/profile";
+        }
+
+        try {
+            LocalDate birthDate = null;
+            if (birth != null && !birth.trim().isEmpty()) {
+                birthDate = LocalDate.parse(birth);
+            }
+
+            userService.updateUserByAdmin(id, name, email, birthDate, role);
+            redirectAttributes.addFlashAttribute("success", "Данные пользователя обновлены");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении: " + e.getMessage());
+        }
+
+        return "redirect:/users/admin";
+    }
+
 }
