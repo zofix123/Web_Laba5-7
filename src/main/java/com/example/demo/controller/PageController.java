@@ -54,7 +54,7 @@ public class PageController {
 
         //Отображение счетчика посещений в профиле
         model.addAttribute("user", user);
-
+        model.addAttribute("isAdmin", "admin".equals(user.getRole()));
         return "profile";
     }
 

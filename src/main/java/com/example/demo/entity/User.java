@@ -21,17 +21,10 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String avatar;
+    @Column(nullable = false)
+    private String role = "user"; // значение по умолчанию
 
     public User(){}
-
-    public User(long id, String name, String email, LocalDate birth, int age) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.birth = birth;
-        this.age = age;
-        this.password = password;
-    }
 
     public long getId() {
         return id;
@@ -81,7 +74,6 @@ public class User {
         this.visitCount = visitCount;
     }
 
-    // Увеличить счетчик на 1
     public void incrementVisitCount() {
         this.visitCount++;
     }
@@ -100,6 +92,14 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 

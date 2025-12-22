@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Панель администратора</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    .back-link {
+      margin-bottom: 20px;
+      display: inline-block;
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.9em;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .actions {
+      white-space: nowrap;
+    }
+    .btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin: 2px;
+      font-size: 0.85em;
+    }
+    .btn-delete {
+      background-color: #ff4444;
+      color: white;
+    }
+    .btn-delete:hover {
+      background-color: #cc0000;
+    }
+    .btn-edit {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-edit:hover {
+      background-color: #45a049;
+    }
+    .role-form {
+      display: inline-block;
+      margin: 0;
+    }
+    .role-select {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    .role-select:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    .message {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 4px;
+      border-left: 4px solid;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border-color: #c3e6cb;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 25px;
+      width: 500px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .close {
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #999;
+    }
+    .close:hover {
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+    .form-actions {
+      text-align: right;
+      margin-top: 20px;
+    }
+    .form-actions button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+    .form-actions .cancel {
+      background-color: #f0f0f0;
+      margin-right: 10px;
+    }
+    .form-actions .save {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .form-actions .save:hover {
+      background-color: #45a049;
+    }
+    .stats {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+<div style="text-align: right; color: gray; font-size: 0.9em;">
+  Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
+</div>
+<div class="container">
+  <a href="/profile" class="back-link">← Назад в профиль</a>
+
+  <h1>Панель администратора</h1>
+
+  <!-- Статистика -->
+  <div class="stats">
+    Всего пользователей: <strong th:text="${totalUsers}">0</strong> |
+    Администраторов: <strong th:text="${adminCount}">0</strong> |
+    Модераторов: <strong th:text="${moderatorCount}">0</strong> |
+    Пользователей: <strong th:text="${userCount}">0</strong>
+  </div>
+
+  <!-- Сообщения об успехе/ошибке -->
+  <div th:if="${param.success}" class="message success">
+    <span th:text="${param.success}"></span>
+  </div>
+  <div th:if="${param.error}" class="message error">
+    <span th:text="${param.error}"></span>
+  </div>
+
+  <div th:if="${users != null and !users.isEmpty()}">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Email</th>
+        <th>Дата рождения</th>
+        <th>Возраст</th>
+        <th>Роль</th>
+        <th>Посещений</th>
+        <th>Действия</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.birth}"></td>
+        <td th:text="${user.age}"></td>
+        <td>
+          <form th:action="@{/users/admin/update-role/{id}(id=${user.id})}"
+                method="post"
+                class="role-form"
+                th:if="${session.user != null and session.user.id != user.id}">
+            <select name="role" class="role-select" onchange="this.form.submit()">
+              <option value="admin" th:selected="${user.role == 'admin'}">admin</option>
+              <option value="moderator" th:selected="${user.role == 'moderator'}">moderator</option>
+              <option value="user" th:selected="${user.role == 'user'}">user</option>
+            </select>
+          </form>
+          <span th:if="${session.user != null and session.user.id == user.id}" th:text="${user.role} + ' (вы)'"></span>
+        </td>
+        <td th:text="${user.visitCount}"></td>
+        <td class="actions">
+          <button class="btn btn-edit"
+                  th:attr="data-id=${user.id},
+                data-name=${user.name},
+                data-email=${user.email},
+                data-birth=${user.birth},
+                data-role=${user.role}"
+                  onclick="openEditModalFromData(this)">
+            Изменить
+          </button>
+
+          <form th:action="@{/users/admin/delete/{id}(id=${user.id})}"
+                method="post"
+                style="display: inline;"
+                th:if="${session.user != null and session.user.id != user.id}"
+                th:attr="data-name=${user.name}"
+                onsubmit="return confirmDelete(this)">
+            <button type="submit" class="btn btn-delete">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${users == null or users.isEmpty()}">
+    <p>Нет пользователей для отображения.</p>
+  </div>
+
+  <!-- Модальное окно для редактирования пользователя -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h2>Редактирование пользователя</h2>
+      <form id="editForm" method="post" action="">
+        <div class="form-group">
+          <label for="editName">Имя:</label>
+          <input type="text" id="editName" name="name">
+        </div>
+
+        <div class="form-group">
+          <label for="editEmail">Email:</label>
+          <input type="email" id="editEmail" name="email">
+        </div>
+
+        <div class="form-group">
+          <label for="editBirth">Дата рождения:</label>
+          <input type="date" id="editBirth" name="birth">
+        </div>
+
+        <div class="form-group">
+          <label for="editRole">Роль:</label>
+          <select id="editRole" name="role">
+            <option value="admin">admin</option>
+            <option value="moderator">moderator</option>
+            <option value="user">user</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel" onclick="closeEditModal()">Отмена</button>
+          <button type="submit" class="save">Сохранить изменения</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Функции для работы с модальным окном
+  function openEditModal(id, name, email, birth, role) {
+    document.getElementById('editName').value = name;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editBirth').value = birth;
+    document.getElementById('editRole').value = role;
+
+    // Устанавливаем action формы
+    document.getElementById('editForm').action = '/users/admin/update/' + id;
+
+    document.getElementById('editModal').style.display = 'block';
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  // Закрытие модального окна при клике вне его
+  window.addEventListener('click', function(event) {
+    var modal = document.getElementById('editModal');
+    if (event.target === modal) {
+      closeEditModal();
+    }
+  });
+
+  // Закрытие модального окна при нажатии ESC
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeEditModal();
+    }
+  });
+
+  function openEditModalFromData(button) {
+    var id = button.getAttribute('data-id');
+    var name = button.getAttribute('data-name');
+    var email = button.getAttribute('data-email');
+    var birth = button.getAttribute('data-birth');
+    var role = button.getAttribute('data-role');
+
+    openEditModal(id, name, email, birth, role);
+  }
+
+  // Альтернативная функция для подтверждения удаления
+  function confirmDelete(form) {
+    var name = form.getAttribute('data-name');
+    return confirm('Вы уверены, что хотите удалить пользователя "' + name + '"?');
+  }
+
+</script>
+<script th:src="@{/js/time_fetcher.js}"></script>
+</body>
+</html>

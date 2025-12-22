@@ -4,6 +4,7 @@ import com.example.demo.exception.EmailAlreadyExistsException;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -89,7 +92,6 @@ public class UserService {
         }
     }
 
-    //edik b
     @Transactional
     public User saveAvatar(Long userId, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
@@ -118,7 +120,7 @@ public class UserService {
         if (originalFilename != null && originalFilename.contains(".")) {
             fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        String newFilename = UUID.randomUUID() + fileExtension;
+        String newFilename = UUID.randomUUID().toString() + fileExtension;
 
         // Сохраняем файл
         Path filePath = uploadPath.resolve(newFilename);
@@ -144,9 +146,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
-
-    //edik e
 
     @Transactional
     public void update(Long id, String email, String name, String password, String confirmPassword) {
@@ -232,4 +231,70 @@ public class UserService {
         user.incrementVisitCount(); // увеличиваем счетчик
         return userRepository.save(user); // сохраняем и возвращаем
     }
+
+    // Метод для получения пользователей по роли
+    public List<User> findByRole(String role) {
+        return userRepository.findAll().stream()
+                .filter(user -> role.equals(user.getRole()))
+                .collect(Collectors.toList());
+    }
+
+    // Метод для получения всех пользователей (с сортировкой)
+    public List<User> getAllUsersSorted() {
+        return userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+    }
+
+    // Метод для обновления роли пользователя
+    @Transactional
+    public User updateUserRole(Long userId, String newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        // Проверяем валидность роли
+        List<String> validRoles = Arrays.asList("admin", "user", "moderator");
+        if (!validRoles.contains(newRole)) {
+            throw new IllegalArgumentException("Недопустимая роль: " + newRole);
+        }
+
+        user.setRole(newRole);
+        return userRepository.save(user);
+    }
+
+    // Метод для обновления пользователя (администратором)
+    @Transactional
+    public User updateUserByAdmin(Long userId, String name, String email, LocalDate birth, String role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        if (name != null && !name.trim().isEmpty()) {
+            user.setName(name);
+        }
+
+        if (email != null && !email.trim().isEmpty() && !email.equals(user.getEmail())) {
+            // Проверяем уникальность email
+            Optional<User> existingUser = userRepository.findByEmail(email);
+            if (existingUser.isPresent() && existingUser.get().getId() != userId) {
+                throw new EmailAlreadyExistsException("Email уже используется другим пользователем");
+            }
+            user.setEmail(email);
+        }
+
+        if (birth != null) {
+            user.setBirth(birth);
+            user.setAge(Period.between(birth, LocalDate.now()).getYears());
+        }
+
+        if (role != null && !role.trim().isEmpty()) {
+            List<String> validRoles = Arrays.asList("admin", "user", "moderator");
+            if (!validRoles.contains(role)) {
+                throw new IllegalArgumentException("Недопустимая роль: " + role);
+            }
+            user.setRole(role);
+        }
+
+        return userRepository.save(user);
+    }
+
+
+
 }
