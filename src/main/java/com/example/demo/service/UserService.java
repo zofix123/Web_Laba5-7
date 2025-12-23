@@ -86,11 +86,12 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        userRepository.deleteById(id);
         if (!userRepository.existsById(id)) {
             throw new IllegalStateException("юзера с таким id " + id + " не существует");
         }
+        userRepository.deleteById(id);
     }
+
 
     @Transactional
     public User saveAvatar(Long userId, MultipartFile file) throws IOException {
@@ -294,7 +295,4 @@ public class UserService {
 
         return userRepository.save(user);
     }
-
-
-
 }

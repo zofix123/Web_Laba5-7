@@ -8,6 +8,17 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // ДОБАВИТЬ этот метод - Spring Data JPA автоматически создаст запрос
     Optional<User> findByEmail(String email);
+
+    // следующий пользователь по id (для стрелки вправо)
+    Optional<User> findFirstByIdGreaterThanAndIdNotOrderByIdAsc(Long id, Long excludeId);
+
+    // предыдущий пользователь по id (для стрелки влево)
+    Optional<User> findFirstByIdLessThanAndIdNotOrderByIdDesc(Long id, Long excludeId);
+
+    // первый пользователь (если мы только зашли и id не задан)
+    Optional<User> findFirstByIdNotOrderByIdAsc(Long excludeId);
+
+    // если никто не залогинен
+    Optional<User> findFirstByOrderByIdAsc();
 }

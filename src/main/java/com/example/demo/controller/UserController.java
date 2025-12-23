@@ -39,7 +39,7 @@ public class UserController {
     public String create(@RequestParam String name,
                          @RequestParam String email,
                          @RequestParam String password,
-                         @RequestParam String confirmPassword, // Подтверждение пароля
+                         @RequestParam String confirmPassword,
                          @RequestParam String birth,
                          HttpSession session,
                          Model model) {

@@ -13,6 +13,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+    private String city;
     @Column(nullable = false, unique = true)
     private String email;
     private LocalDate birth;
@@ -22,7 +23,7 @@ public class User {
     private String password;
     private String avatar;
     @Column(nullable = false)
-    private String role = "user"; // значение по умолчанию
+    private String role = "user";
 
     public User(){}
 
@@ -41,6 +42,11 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getCity() { return city; }
+
+    public void setCity(String city) { this.city = city; }
+
 
     public String getEmail() {
         return email;
@@ -114,6 +120,7 @@ public class User {
                 ", visitCount=" + visitCount +
                 ", password='" + password + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", city='" + city + '\'' +
                 '}';
     }
 }
