@@ -107,7 +107,7 @@
                         <div class="profile-field__check"></div>
                     </div>
 
-                    <!-- Возраст -->
+                    <!-- Возраст (read-only) -->
                     <div class="profile-field">
                         <label class="profile-field__name" for="age">Возраст</label>
                         <input
@@ -118,16 +118,25 @@
                                 min="0"
                                 max="120"
                                 th:value="${session.user.age}"
-                                required
+                                readonly
                         />
                         <div class="profile-field__check"></div>
                     </div>
 
-                    <div class="profile-field profile-field--readonly">
-                        <div class="profile-field__name">Визиты</div>
-                        <div class="profile-field__input" th:text="${session.user.visitCount}">0</div>
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="visitCount">Визиты</label>
+                        <input
+                                class="profile-field__input"
+                                id="visitCount"
+                                name="visitCount"
+                                type="number"
+                                th:value="${session.user.visitCount}"
+                                readonly
+                                tabindex="-1"
+                        />
                         <div class="profile-field__check"></div>
                     </div>
+
 
                     <button class="button profile__submit" type="submit">Подтвердить</button>
 
