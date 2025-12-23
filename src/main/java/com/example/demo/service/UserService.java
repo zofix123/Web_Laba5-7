@@ -121,7 +121,7 @@ public class UserService {
         if (originalFilename != null && originalFilename.contains(".")) {
             fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        String newFilename = UUID.randomUUID().toString() + fileExtension;
+        String newFilename = UUID.randomUUID() + fileExtension;
 
         // Сохраняем файл
         Path filePath = uploadPath.resolve(newFilename);
