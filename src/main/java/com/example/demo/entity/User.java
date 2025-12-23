@@ -22,7 +22,7 @@ public class User {
     private String password;
     private String avatar;
     @Column(nullable = false)
-    private String role = "user"; // значение по умолчанию
+    private String role = "user";
 
     public User(){}
 

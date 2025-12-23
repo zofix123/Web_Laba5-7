@@ -86,11 +86,12 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        userRepository.deleteById(id);
         if (!userRepository.existsById(id)) {
             throw new IllegalStateException("юзера с таким id " + id + " не существует");
         }
+        userRepository.deleteById(id);
     }
+
 
     @Transactional
     public User saveAvatar(Long userId, MultipartFile file) throws IOException {
@@ -120,7 +121,7 @@ public class UserService {
         if (originalFilename != null && originalFilename.contains(".")) {
             fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        String newFilename = UUID.randomUUID().toString() + fileExtension;
+        String newFilename = UUID.randomUUID() + fileExtension;
 
         // Сохраняем файл
         Path filePath = uploadPath.resolve(newFilename);
@@ -294,7 +295,4 @@ public class UserService {
 
         return userRepository.save(user);
     }
-
-
-
 }

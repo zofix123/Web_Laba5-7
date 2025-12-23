@@ -1,88 +1,218 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Личный кабинет</title>
-    <style>
-        .avatar-container {
-            margin-bottom: 20px;
-        }
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ddd;
-        }
-        .default-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #ddd;
-            font-size: 48px;
-            color: #999;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Сайт знакомств - профиль</title>
+    <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
+<div class="page">
+    <header class="header">
+        <div class="header__inner">
+            <div></div>
 
-<div style="text-align: right; color: gray; font-size: 0.9em;">
-    Текущее время сервера: <span id="serverTime" th:text="${serverTime}"></span>
-</div>
+            <div class="header__brand">
+                <a href="/main">САЙТ ЗНАКОМСТВ</a>
+            </div>
 
-<!-- Проверяем, авторизован ли пользователь -->
-<div th:if="${session.user == null}">
-    <h2>Вы не авторизованы</h2>
-    <p>Пожалуйста, <a th:href="@{/users/login}">войдите</a> или <a th:href="@{/users/register}">зарегистрируйтесь</a>.</p>
-</div>
-
-<div th:if="${session.user != null}">
-    <h2>Личный кабинет</h2>
-
-    <!-- Отображение аватара -->
-    <div class="avatar-container">
-        <div th:if="${session.user.avatar != null}">
-            <img th:src="${session.user.avatar}"
-                 alt="Аватар пользователя"
-                 class="avatar">
+            <nav class="header__nav">
+                <a href="/profile">ПРОФИЛЬ</a>
+            </nav>
         </div>
-        <div th:if="${session.user.avatar == null}" class="default-avatar">
-            👤
-        </div>
-        <br>
-        <a th:href="@{/users/upload-avatar}">Изменить аватар</a>
+    </header>
+
+    <div class="server-time">
+        Текущее время сервера:
+        <span id="serverTime" th:text="${serverTime}">—</span>
     </div>
 
-    <p><strong>Имя:</strong> <span th:text="${session.user.name}"></span></p>
-    <p><strong>Email:</strong> <span th:text="${session.user.email}"></span></p>
-    <p><strong>Дата рождения:</strong> <span th:text="${session.user.birth}"></span></p>
-    <p><strong>Возраст:</strong> <span th:text="${session.user.age}"></span> лет</p>
+    <main class="profile">
+        <!-- НЕ АВТОРИЗОВАН -->
+        <section class="box status" th:if="${session.user == null}">
+            <div class="status__text">Вы не авторизованы</div>
+            <div class="status__text">
+                Пожалуйста, <a class="link" th:href="@{/users/login}">войдите</a> или
+                <a class="link" th:href="@{/users/register}">зарегистрируйтесь</a>.
+            </div>
 
-    <!-- отображение счетчика посещений -->
-    <p><strong>Количество посещений:</strong>
-        <span th:text="${session.user.visitCount}"></span>
-    </p>
+            <div class="status__actions">
+                <a class="button" th:href="@{/users/login}">Вход</a>
+                <a class="button" th:href="@{/users/register}">Регистрация</a>
+            </div>
+        </section>
 
-    <br>
-    <a th:href="@{/users/change-password}">Сменить пароль</a>
-    <br>
+        <!-- АВТОРИЗОВАН -->
+        <div th:if="${session.user != null}">
+            <section class="profile__title">
+                <span>ПРОФИЛЬ</span>
+            </section>
 
-    <br>
-    <div th:if="${session.user.role == 'admin'}">
-        <a th:href="@{/users/admin}" style="color: #ff6b6b;">Панель администратора</a>
-        <br>
-    </div>
-    <br>
+            <section class="profile__panel">
+                <!-- Аватар -->
+                <div class="profile__photo-block">
+                    <div class="profile__avatar">
+                        <img th:if="${session.user.avatar != null and !#strings.isEmpty(session.user.avatar)}"
+                             th:src="${session.user.avatar}"
+                             alt="Аватар"
+                             class="profile__avatar-img" />
 
-    <br>
-    <a th:href="@{/}">На главную</a>
-    <br>
-    <a th:href="@{/users/logout}">Выйти</a>
+                        <div th:if="${session.user.avatar == null or #strings.isEmpty(session.user.avatar)}"
+                             class="profile__avatar-placeholder">👤</div>
+                    </div>
+
+                    <a class="link profile__avatar-link" th:href="@{/users/upload-avatar}">
+                        Изменить аватар
+                    </a>
+                </div>
+
+                <form class="profile__form" method="post" action="/profile">
+                    <!-- Имя -->
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="name">Имя</label>
+                        <input
+                                class="profile-field__input"
+                                id="name"
+                                name="name"
+                                type="text"
+                                th:value="${session.user.name}"
+                                required
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
+                    <!-- Email (read-only) -->
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="email">Email</label>
+                        <input
+                                class="profile-field__input"
+                                id="email"
+                                type="email"
+                                th:value="${session.user.email}"
+                                readonly
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
+                    <!-- Дата рождения (LocalDate) -->
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="birth">Рожд.</label>
+                        <input
+                                class="profile-field__input"
+                                id="birth"
+                                name="birth"
+                                type="date"
+                                th:value="${session.user.birth}"
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
+                    <!-- Возраст (read-only) -->
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="age">Возраст</label>
+                        <input
+                                class="profile-field__input"
+                                id="age"
+                                name="age"
+                                type="number"
+                                min="0"
+                                max="120"
+                                th:value="${session.user.age}"
+                                readonly
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="visitCount">Визиты</label>
+                        <input
+                                class="profile-field__input"
+                                id="visitCount"
+                                name="visitCount"
+                                type="number"
+                                th:value="${session.user.visitCount}"
+                                readonly
+                                tabindex="-1"
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
+
+                    <button class="button profile__submit" type="submit">Подтвердить</button>
+
+                    <div class="profile__links">
+                        <a class="link" th:href="@{/users/change-password}">Сменить пароль</a>
+
+                        <a class="link"
+                           th:if="${session.user.role == 'admin'}"
+                           th:href="@{/users/admin}"
+                        >Панель администратора</a>
+
+                        <a class="link" th:href="@{/main}">На главную</a>
+                        <a class="link" th:href="@{/users/logout}">Выйти</a>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Лайки надо связать с базой данных-->
+            <section class="likes">
+                <div class="likes__title">
+                    <span>ВАШИ ЛАЙКИ</span>
+                </div>
+
+                <div class="likes__box">
+                    <div class="likes__grid">
+                        <div class="like-item">
+                            <div class="like-item__inner">
+                                <div class="like-item__img"></div>
+                                <div class="like-item__text">
+                                    <div class="t1">имя, возраст</div>
+                                    <div>о себе</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="like-item">
+                            <div class="like-item__inner">
+                                <div class="like-item__img"></div>
+                                <div class="like-item__text">
+                                    <div class="t1">имя, возраст</div>
+                                    <div>о себе</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="like-item">
+                            <div class="like-item__inner">
+                                <div class="like-item__img"></div>
+                                <div class="like-item__text">
+                                    <div class="t1">имя, возраст</div>
+                                    <div>о себе</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="like-item">
+                            <div class="like-item__inner">
+                                <div class="like-item__img"></div>
+                                <div class="like-item__text">
+                                    <div class="t1">имя, возраст</div>
+                                    <div>о себе</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        Сайт разработали студенты группы 24ВП1 Гриднев Владислав и Пономарев Павел
+    </footer>
 </div>
 
-<script th:src="@{/js/time_fetcher.js}"></script>
+<script src="/js/time_fetcher.js"></script>
 </body>
 </html>
