@@ -22,12 +22,10 @@ public class PageController {
     }
 
     @GetMapping("/")
-    public String index(HttpSession session, Model model) {
-        addServerTimeToModel(model);
-        return "main";
+    public String redirect() {;
+        return "redirect:/main";
     }
 
-    // чтобы не было дублей страниц:
     @GetMapping("/register")
     public String registerRedirect() {
         return "redirect:/users/register";

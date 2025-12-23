@@ -83,15 +83,11 @@
             <div class="card__meta">
                 <div class="card__meta-grid">
                     <div class="card__name"
-                         th:text="${candidate.name}">
+                         th:text="${candidate != null ? candidate.name : 'Нет анкет'}">
                     </div>
 
                     <div class="card__age"
-                         th:text= "${candidate.age} + лет">
-                    </div>
-
-                    <div class="card__mini-about"
-                         th:text="${candidate.city}">
+                         th:text="${candidate != null ? candidate.age + ' лет' : ''}">
                     </div>
                 </div>
             </div>
