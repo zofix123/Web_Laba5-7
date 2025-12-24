@@ -208,6 +208,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public User updateProfile(Long userId, String name, LocalDate birth) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+
+        if (name != null && !name.trim().isEmpty()) {
+            user.setName(name);
+        }
+
+        if (birth != null) {
+            user.setBirth(birth);
+            user.setAge(Period.between(birth, LocalDate.now()).getYears());
+        }
+
+        return userRepository.save(user);
+    }
+
     //  Поиск пользователя по email
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);

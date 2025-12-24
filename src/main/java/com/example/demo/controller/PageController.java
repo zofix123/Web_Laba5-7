@@ -5,12 +5,15 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.UserInteractionRepository;
 import com.example.demo.service.InteractionService;
+import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 import java.util.List;
 
@@ -20,13 +23,16 @@ public class PageController {
     private final UserRepository userRepository;
     private final UserInteractionRepository interactionRepository;
     private final InteractionService interactionService;
+    private final UserService userService;
 
     public PageController(UserRepository userRepository,
                           UserInteractionRepository interactionRepository,
-                          InteractionService interactionService) {
+                          InteractionService interactionService,
+                          UserService userService) {
         this.userRepository = userRepository;
         this.interactionRepository = interactionRepository;
         this.interactionService = interactionService;
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -41,6 +47,35 @@ public class PageController {
 
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser == null) return "redirect:/users/login";
+
+        List<User> likedUsers = interactionRepository.findTargetsByFromUserAndType(sessionUser.getId(), InteractionType.LIKE);
+
+        model.addAttribute("user", sessionUser);
+        model.addAttribute("likedUsers", likedUsers);
+        return "profile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(@RequestParam String name,
+                                @RequestParam LocalDate birth,
+                                HttpSession session,
+                                Model model) {
+        addServerTimeToModel(model);
+
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) return "redirect:/users/login";
+
+        try {
+            // Обновляем через сервис
+            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth);
+
+            // Обновляем пользователя в сессии
+            session.setAttribute("user", updatedUser);
+
+            model.addAttribute("success", "Данные профиля обновлены");
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при обновлении: " + e.getMessage());
+        }
 
         List<User> likedUsers = interactionRepository.findTargetsByFromUserAndType(sessionUser.getId(), InteractionType.LIKE);
 
