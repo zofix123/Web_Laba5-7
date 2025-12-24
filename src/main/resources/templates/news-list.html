@@ -5,160 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Сайт знакомств - Новости</title>
   <link rel="stylesheet" href="/css/styles.css" />
-  <style>
-    /* Стили для страницы новостей */
-    .news-page-wrapper {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .news-header-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .news-header-section h1 {
-      font-size: 28px;
-      font-weight: bold;
-      margin: 0;
-    }
-
-    .news-card-item {
-      background: #fff;
-      border: var(--border);
-      border-radius: var(--radius);
-      padding: 25px;
-      margin-bottom: 25px;
-      width: 100%;
-    }
-
-    .news-card-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #000;
-    }
-
-    .news-card-image {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .news-card-image img {
-      max-width: 100%;
-      max-height: 400px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      padding: 5px;
-      background: #fff;
-    }
-
-    .news-card-content {
-      line-height: 1.6;
-      color: #333;
-      margin-bottom: 20px;
-      font-size: 16px;
-      white-space: pre-line;
-    }
-
-    .news-card-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      color: #666;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-      margin-top: 20px;
-    }
-
-    .news-card-actions {
-      margin-top: 25px;
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .news-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 150px;
-      padding: 12px 24px;
-      height: 44px;
-      border: 1px solid #000;
-      border-radius: 10px;
-      background: #facccc;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #000;
-      font-family: inherit;
-      box-sizing: border-box;
-      text-align: center;
-    }
-
-    .news-btn:hover {
-      opacity: 0.9;
-    }
-
-    .news-btn:active {
-      transform: translateY(1px);
-    }
-
-    .news-btn-form {
-      display: inline;
-      margin: 0;
-      padding: 0;
-    }
-
-    .news-btn-form button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 150px;
-      padding: 12px 24px;
-      height: 44px;
-      border: 1px solid #000;
-      border-radius: 10px;
-      background: #facccc;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      color: #000;
-      font-family: inherit;
-      box-sizing: border-box;
-      margin: 0;
-    }
-
-    .news-btn-form button:hover {
-      opacity: 0.9;
-    }
-
-    .news-btn-form button:active {
-      transform: translateY(1px);
-    }
-
-    .news-empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #666;
-      font-size: 18px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: #f9f9f9;
-      margin-top: 20px;
-    }
-
-    .add-news-btn {
-      min-width: 180px;
-    }
-  </style>
 </head>
 <body>
 <div class="page">
@@ -169,8 +15,8 @@
         <a href="/main">САЙТ ЗНАКОМСТВ</a>
       </div>
       <nav class="header__nav">
-        <a href="/profile">ПРОФИЛЬ</a>
         <a href="/news">НОВОСТИ</a>
+        <a href="/profile">ПРОФИЛЬ</a>
       </nav>
     </div>
   </header>
@@ -180,11 +26,12 @@
   </div>
 
   <main class="content">
-    <div class="news-page-wrapper">
-      <div class="news-header-section">
-        <h1>НОВОСТИ</h1>
+    <section class="news">
+      <div class="news__top">
+        <div class="news__title">НОВОСТИ</div>
+
         <div th:if="${session.user != null and (session.user.role == 'admin' or session.user.role == 'moderator')}">
-          <a class="button add-news-btn" th:href="@{/news/create}">Добавить новость</a>
+          <a class="button" th:href="@{/news/create}">Добавить новость</a>
         </div>
       </div>
 
@@ -192,44 +39,45 @@
       <div class="auth__error" th:if="${error}" th:text="${error}"></div>
 
       <div th:if="${newsList != null and !newsList.isEmpty()}">
-        <div th:each="news : ${newsList}" class="news-card-item">
-          <div class="news-card-title" th:text="${news.title}"></div>
+        <article class="news-card" th:each="n : ${newsList}">
+          <div class="news-card__title" th:text="${n.title}">Заголовок</div>
 
-          <div class="news-card-image" th:if="${news.imagePath}">
-            <img th:src="@{${news.imagePath}}" alt="Изображение новости" />
+          <div class="news-card__image"
+               th:if="${n.imagePath != null and !#strings.isEmpty(n.imagePath)}">
+            <img th:src="${n.imagePath}" alt="Изображение новости" />
           </div>
 
-          <div class="news-card-content" th:text="${news.content}"></div>
+          <div class="news-card__content" th:text="${n.content}"></div>
 
-          <div class="news-card-meta">
-            <div>
-              Автор: <span th:text="${news.author.name}"></span>
-            </div>
-            <div>
-              Опубликовано: <span th:text="${#temporals.format(news.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
-            </div>
+          <div class="news-card__meta">
+            <div>Автор: <span th:text="${n.author.name}"></span></div>
+            <div>Опубликовано: <span th:text="${#temporals.format(n.createdAt, 'dd.MM.yyyy HH:mm')}"></span></div>
           </div>
 
-          <div class="news-card-actions" th:if="${session.user != null}">
-            <a th:if="${session.user.role == 'admin' or session.user.role == 'moderator' or news.author.id == session.user.id}"
-               class="news-btn"
-               th:href="@{/news/edit/{id}(id=${news.id})}">Редактировать</a>
+          <div class="news-card__actions" th:if="${session.user != null}">
+            <a class="button"
+               th:if="${session.user.role == 'admin' or session.user.role == 'moderator' or n.author.id == session.user.id}"
+               th:href="@{/news/edit/{id}(id=${n.id})}">
+              Редактировать
+            </a>
 
-            <form th:if="${session.user.role == 'admin' or session.user.role == 'moderator' or news.author.id == session.user.id}"
-                  th:action="@{/news/delete/{id}(id=${news.id})}"
+            <form th:if="${session.user.role == 'admin' or session.user.role == 'moderator' or n.author.id == session.user.id}"
+                  th:action="@{/news/delete/{id}(id=${n.id})}"
                   method="post"
-                  class="news-btn-form">
-              <button class="news-btn" type="submit"
-                      onclick="return confirm('Удалить эту новость?')">Удалить</button>
+                  style="margin:0;">
+              <button class="button" type="submit"
+                      onclick="return confirm('Удалить эту новость?')">
+                Удалить
+              </button>
             </form>
           </div>
-        </div>
+        </article>
       </div>
 
-      <div th:if="${newsList == null or newsList.isEmpty()}" class="news-empty-state">
+      <div class="news-empty" th:if="${newsList == null or newsList.isEmpty()}">
         Пока нет новостей.
       </div>
-    </div>
+    </section>
   </main>
 
   <footer class="footer">

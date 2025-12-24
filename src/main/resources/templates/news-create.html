@@ -5,49 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Сайт знакомств - Создание новости</title>
     <link rel="stylesheet" href="/css/styles.css" />
-    <style>
-        .image-upload {
-            margin-bottom: 20px;
-        }
-
-        .image-upload label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .image-upload input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #000;
-            border-radius: 8px;
-            background: #fff;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .image-preview {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .image-preview img {
-            max-width: 300px;
-            max-height: 200px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 5px;
-            background: #fff;
-        }
-
-        .form-note {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            font-style: italic;
-        }
-    </style>
 </head>
 <body>
 <div class="page">
@@ -58,8 +15,8 @@
                 <a href="/main">САЙТ ЗНАКОМСТВ</a>
             </div>
             <nav class="header__nav">
-                <a href="/profile">ПРОФИЛЬ</a>
                 <a href="/news">НОВОСТИ</a>
+                <a href="/profile">ПРОФИЛЬ</a>
             </nav>
         </div>
     </header>
@@ -82,22 +39,30 @@
                     </label>
 
                     <label>
-                        <textarea class="auth__input" name="content" placeholder="Содержание новости"
-                                  rows="10" required style="resize: vertical; min-height: 150px;"></textarea>
+            <textarea class="auth__input auth__textarea"
+                      name="content"
+                      placeholder="Содержание новости"
+                      rows="8"
+                      required></textarea>
                     </label>
 
-                    <div class="image-upload">
-                        <label for="imageFile">Изображение для новости (необязательно):</label>
-                        <input type="file" id="imageFile" name="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"
+                    <div class="news-upload">
+                        <div class="news-upload__label">Изображение (необязательно)</div>
+                        <input class="auth__input auth__file"
+                               type="file"
+                               id="imageFile"
+                               name="imageFile"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
                                onchange="previewImage(event)" />
-                        <div class="form-note">Поддерживаемые форматы: JPG, PNG, GIF, WebP</div>
-                        <div class="image-preview" id="imagePreview">
-                            <img id="previewImage" src="#" alt="Предпросмотр" />
+                        <div class="news-upload__note">JPG, PNG, GIF, WebP</div>
+
+                        <div class="news-upload__preview" id="imagePreview" style="display:none;">
+                            <img id="previewImage" alt="Предпросмотр" />
                         </div>
                     </div>
                 </div>
 
-                <div class="auth__actions">
+                <div class="auth__actions auth__actions--row">
                     <button class="button" type="submit">СОЗДАТЬ</button>
                     <a class="button" th:href="@{/news}">ОТМЕНА</a>
                 </div>
@@ -111,26 +76,6 @@
 </div>
 
 <script th:src="@{/js/time_fetcher.js}"></script>
-<script>
-    function previewImage(event) {
-        const input = event.target;
-        const preview = document.getElementById('previewImage');
-        const previewContainer = document.getElementById('imagePreview');
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                previewContainer.style.display = 'block';
-            }
-
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            preview.src = '#';
-            previewContainer.style.display = 'none';
-        }
-    }
-</script>
+<script th:src="@{/js/previewImage.js}"></script>
 </body>
 </html>

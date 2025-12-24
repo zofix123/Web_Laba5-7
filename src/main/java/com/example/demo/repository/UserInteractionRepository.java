@@ -6,6 +6,9 @@ import com.example.demo.entity.InteractionType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,4 +63,12 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
         order by u.id asc
     """)
     List<User> findFirstAny(Pageable pageable);
+
+    void deleteByFromUser_IdOrToUser_Id(Long fromId, Long toId);
+    boolean existsByFromUser_IdOrToUser_Id(Long fromId, Long toId);
+
+    @Modifying
+    @Transactional
+    @Query("delete from UserInteraction ui where ui.fromUser.id = :userId or ui.toUser.id = :userId")
+    void deleteAllForUser(@Param("userId") Long userId);
 }
