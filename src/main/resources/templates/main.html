@@ -28,7 +28,7 @@
     </div>
 
     <main class="content">
-        <section class="status box">
+        <section class="box status">
             <div th:if="${session.user == null}">
                 <div class="status__text">Вы не авторизованы</div>
                 <div class="status__actions">
@@ -52,63 +52,58 @@
             </div>
         </section>
 
-        <section class="viewer"
-                 th:with="p=${prevId != null ? prevId : null},
-                  n=${nextId != null ? nextId : null}">
-            <a class="viewer__arrow"
-               th:href="@{/main(id=${p})}"
-               aria-label="Назад">←</a>
-
-            <div class="viewer__frame"></div>
-
-            <a class="viewer__arrow"
-               th:href="@{/main(id=${n})}"
-               aria-label="Вперёд">→</a>
-        </section>
-
-
-        <section class="card">
+        <section class="card" th:if="${candidate != null}">
             <div class="card__photo">
                 <img
-                        th:if="${candidate != null and candidate.avatar != null and !#strings.isEmpty(candidate.avatar)}"
+                        th:if="${candidate.avatar != null and !#strings.isEmpty(candidate.avatar)}"
                         th:src="${candidate.avatar}"
                         alt="Фото"
                         style="width:100%; height:100%; object-fit:cover;"
                 />
                 <div
-                        th:if="${candidate == null or candidate.avatar == null or #strings.isEmpty(candidate.avatar)}"
+                        th:if="${candidate.avatar == null or #strings.isEmpty(candidate.avatar)}"
                         style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; color:#999;"
                 >👤</div>
             </div>
 
             <div class="card__meta">
                 <div class="card__meta-grid">
-                    <div class="card__name"
-                         th:text="${candidate != null ? candidate.name : 'Нет анкет'}">
-                    </div>
-
-                    <div class="card__age"
-                         th:text="${candidate != null ? candidate.age + ' лет' : ''}">
-                    </div>
+                    <div class="card__name" th:text="${candidate.name}">Имя</div>
+                    <div class="card__age" th:text="${candidate.age} + ' лет'">18 лет</div>
                 </div>
             </div>
 
             <div class="card__actions">
-                <button class="icon-button" type="button" aria-label="Лайк" th:disabled="${candidate == null}">
-                    <img src="/img/like.png" alt="" />
-                </button>
-                <button class="icon-button" type="button" aria-label="Дизлайк" th:disabled="${candidate == null}">
-                    <img src="/img/dislike.png" alt="" />
-                </button>
+                <form th:action="@{/main/like}" method="post">
+                    <input type="hidden" name="candidateId" th:value="${candidate.id}">
+                    <button class="icon-button" type="submit" aria-label="Лайк"
+                            th:disabled="${session.user == null}">
+                        <img src="/img/like.png" alt="" />
+                    </button>
+                </form>
+
+                <form th:action="@{/main/dislike}" method="post">
+                    <input type="hidden" name="candidateId" th:value="${candidate.id}">
+                    <button class="icon-button" type="submit" aria-label="Дизлайк"
+                            th:disabled="${session.user == null}">
+                        <img src="/img/dislike.png" alt="" />
+                    </button>
+                </form>
             </div>
         </section>
+
+        <section class="box status" th:if="${candidate == null}">
+            <div class="status__text">Действующих анкет нет или они закончились</div>
+        </section>
+
     </main>
 
     <footer class="footer">
         Сайт разработали студенты группы 24ВП1 Гриднев Владислав и Пономарев Павел
     </footer>
 </div>
-
+<div id="toast" class="toast" aria-live="polite"></div>
 <script src="/js/time_fetcher.js"></script>
+<script src="/js/notifications.js"></script>
 </body>
 </html>

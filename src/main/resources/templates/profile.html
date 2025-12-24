@@ -161,47 +161,26 @@
                     <span>ВАШИ ЛАЙКИ</span>
                 </div>
 
-                <div class="likes__box">
-                    <div class="likes__grid">
-                        <div class="like-item">
-                            <div class="like-item__inner">
-                                <div class="like-item__img"></div>
-                                <div class="like-item__text">
-                                    <div class="t1">имя, возраст</div>
-                                    <div>о себе</div>
+                <div class="likes__grid">
+                    <div class="like-item" th:each="u : ${likedUsers}">
+                        <div class="like-item__inner">
+                            <div class="like-item__img">
+                                <img th:if="${u.avatar != null and !#strings.isEmpty(u.avatar)}"
+                                     th:src="${u.avatar}"
+                                     alt="Фото"
+                                     style="width:100%; height:100%; object-fit:cover;" />
+                                <div th:if="${u.avatar == null or #strings.isEmpty(u.avatar)}"
+                                     style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; color:#999;">
+                                    👤
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="like-item">
-                            <div class="like-item__inner">
-                                <div class="like-item__img"></div>
-                                <div class="like-item__text">
-                                    <div class="t1">имя, возраст</div>
-                                    <div>о себе</div>
-                                </div>
-                            </div>
+                            <div class="like-item__text" th:text="${u.name} + ', ' + ${u.age} + ' лет'">Имя, 18 лет</div>
                         </div>
+                    </div>
 
-                        <div class="like-item">
-                            <div class="like-item__inner">
-                                <div class="like-item__img"></div>
-                                <div class="like-item__text">
-                                    <div class="t1">имя, возраст</div>
-                                    <div>о себе</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="like-item">
-                            <div class="like-item__inner">
-                                <div class="like-item__img"></div>
-                                <div class="like-item__text">
-                                    <div class="t1">имя, возраст</div>
-                                    <div>о себе</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div th:if="${likedUsers == null or likedUsers.isEmpty()}" class="status__text">
+                        Пока нет лайков
                     </div>
                 </div>
             </section>
