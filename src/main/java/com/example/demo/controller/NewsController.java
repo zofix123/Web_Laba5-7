@@ -7,9 +7,10 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class NewsController {
     @PostMapping("/create")
     public String createNews(@RequestParam String title,
                              @RequestParam String content,
+                             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
@@ -58,8 +60,12 @@ public class NewsController {
         news.setContent(content);
 
         try {
-            newsService.createNews(news, user);
+            newsService.createNews(news, user, imageFile);
             redirectAttributes.addFlashAttribute("success", "Новость успешно создана");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при загрузке изображения: " + e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при создании новости: " + e.getMessage());
         }
@@ -98,6 +104,8 @@ public class NewsController {
     public String updateNews(@PathVariable Long id,
                              @RequestParam String title,
                              @RequestParam String content,
+                             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                             @RequestParam(value = "removeImage", defaultValue = "false") boolean removeImage,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
@@ -106,8 +114,18 @@ public class NewsController {
         }
 
         try {
-            newsService.updateNews(id, title, content, user);
+            News updatedNews;
+            if (removeImage) {
+                // Создаем пустой MultipartFile для удаления изображения
+                updatedNews = newsService.updateNews(id, title, content, user, null);
+            } else {
+                updatedNews = newsService.updateNews(id, title, content, user, imageFile);
+            }
             redirectAttributes.addFlashAttribute("success", "Новость успешно обновлена");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при загрузке изображения: " + e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении новости: " + e.getMessage());
         }
@@ -121,9 +139,21 @@ public class NewsController {
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
-        if (user == null || (!user.getRole().equals("admin") && !user.getRole().equals("moderator"))) {
-            redirectAttributes.addFlashAttribute("error", "У вас нет прав для удаления новостей");
+        if (user == null) {
             return "redirect:/news";
+        }
+
+        // Проверяем права
+        News news = newsService.getNewsById(id).orElse(null);
+        if (news != null) {
+            boolean canDelete = user.getRole().equals("admin") ||
+                    user.getRole().equals("moderator") ||
+                    news.getAuthor().getId() == user.getId();
+
+            if (!canDelete) {
+                redirectAttributes.addFlashAttribute("error", "У вас нет прав для удаления этой новости");
+                return "redirect:/news";
+            }
         }
 
         try {
