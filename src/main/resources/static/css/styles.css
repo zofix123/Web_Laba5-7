@@ -840,3 +840,118 @@ img {
     gap: 10px;
     margin-top: 14px;
 }
+
+/* Убираем переопределение ширины для news-page */
+.content.news-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    align-items: stretch;
+}
+
+/* Исправляем контейнер новостей */
+.news-container {
+    width: var(--page-width);
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* Исправляем заголовок страницы */
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 16px;
+}
+
+.news-header h1 {
+    font-weight: 700;
+    font-size: 24px;
+    margin: 0;
+}
+
+/* Исправляем карточки новостей */
+.news-card {
+    background: var(--bg);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* Заголовок новости */
+.news-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+/* Контент новости */
+.news-content {
+    line-height: 1.5;
+    margin-bottom: 16px;
+    white-space: pre-line; /* Сохраняет переносы строк */
+}
+
+/* Мета-информация */
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    margin-top: 12px;
+}
+
+/* Кнопки действий */
+.news-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+/* Формы в действиях */
+.news-action-form {
+    margin: 0;
+    padding: 0;
+}
+
+/* Сообщение о пустом списке */
+.empty-news {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 18px;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    margin: 20px 16px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .news-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .news-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .news-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .news-actions a,
+    .news-actions button {
+        width: 100%;
+    }
+}

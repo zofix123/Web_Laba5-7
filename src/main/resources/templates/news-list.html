@@ -1,10 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сайт знакомств - Новости</title>
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-$END$
+<div class="page">
+  <header class="header">
+    <div class="header__inner">
+      <div></div>
+      <div class="header__brand">
+        <a href="/main">САЙТ ЗНАКОМСТВ</a>
+      </div>
+      <nav class="header__nav">
+        <a href="/profile">ПРОФИЛЬ</a>
+        <a href="/news">НОВОСТИ</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="server-time">
+    Текущее время сервера: <span id="serverTime" th:text="${serverTime}">—</span>
+  </div>
+
+  <main class="content news-page">
+    <div class="news-container">
+      <div class="news-header">
+        <h1>НОВОСТИ</h1>
+        <div th:if="${session.user != null and (session.user?.role == 'admin' or session.user?.role == 'moderator')}">
+          <a class="button" th:href="@{/news/create}">Добавить новость</a>
+        </div>
+      </div>
+
+      <div class="auth__success" th:if="${success}" th:text="${success}"></div>
+      <div class="auth__error" th:if="${error}" th:text="${error}"></div>
+
+      <div th:if="${newsList != null and !newsList.isEmpty()}">
+        <div th:each="news : ${newsList}" class="news-card">
+          <div class="news-title" th:text="${news.title}"></div>
+          <div class="news-content" th:utext="${news.content}"></div>
+
+          <div class="news-meta">
+            <div>
+              Автор: <span th:text="${news.author.name}"></span>
+            </div>
+            <div>
+              Опубликовано: <span th:text="${#temporals.format(news.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+            </div>
+          </div>
+
+          <div class="news-actions">
+            <div th:if="${session.user != null and (session.user?.role == 'admin' or session.user?.role == 'moderator')}">
+            <a class="button button--small" th:href="@{/news/edit/{id}(id=${news.id})}">Редактировать</a>
+            <form th:action="@{/news/delete/{id}(id=${news.id})}" method="post"
+                  class="news-action-form">
+              <button class="button button--small" type="submit"
+                      onclick="return confirm('Удалить эту новость?')">Удалить</button>
+            </form>
+            </div>
+          </div>
+      </div>
+
+      <div th:if="${newsList == null or newsList.isEmpty()}" class="empty-news">
+        Пока нет новостей.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Сайт разработали студенты группы 24ВП1 Гриднев Владислав и Пономарев Павел
+  </footer>
+</div>
+
+<script th:src="@{/js/time_fetcher.js}"></script>
 </body>
 </html>
