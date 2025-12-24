@@ -17,6 +17,9 @@ public class News {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
@@ -58,6 +61,13 @@ public class News {
 
     public void setContent(String content) {
         this.content = content;
+    }
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public User getAuthor() {

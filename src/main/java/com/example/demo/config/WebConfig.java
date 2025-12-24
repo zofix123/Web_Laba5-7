@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         // Маппинг для доступа к загруженным файлам через веб
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath + "/");
+                .addResourceLocations("file:./uploads/", "file:./uploads/news/");
 
         // для  Tomcat в IDE:
         // String projectPath = Paths.get("").toAbsolutePath().toString();
