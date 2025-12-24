@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сайт знакомств - Новости</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    /* Стили для страницы новостей */
+    .news-page-wrapper {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .news-header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .news-header-section h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .news-card-item {
+      background: #fff;
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 25px;
+      margin-bottom: 25px;
+      width: 100%;
+    }
+
+    .news-card-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #000;
+    }
+
+    .news-card-content {
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 16px;
+      white-space: pre-line;
+    }
+
+    .news-card-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #666;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      margin-top: 20px;
+    }
+
+    .news-card-actions {
+      margin-top: 25px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .news-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      padding: 12px 24px;
+      height: 44px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      background: #facccc;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #000;
+      font-family: inherit;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .news-btn:hover {
+      opacity: 0.9;
+    }
+
+    .news-btn:active {
+      transform: translateY(1px);
+    }
+
+    .news-btn-form {
+      display: inline;
+      margin: 0;
+      padding: 0;
+    }
+
+    .news-btn-form button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      padding: 12px 24px;
+      height: 44px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      background: #facccc;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+      font-family: inherit;
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    .news-btn-form button:hover {
+      opacity: 0.9;
+    }
+
+    .news-btn-form button:active {
+      transform: translateY(1px);
+    }
+
+    .news-empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: #f9f9f9;
+      margin-top: 20px;
+    }
+
+    .add-news-btn {
+      min-width: 180px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="header__inner">
+      <div></div>
+      <div class="header__brand">
+        <a href="/main">САЙТ ЗНАКОМСТВ</a>
+      </div>
+      <nav class="header__nav">
+        <a href="/profile">ПРОФИЛЬ</a>
+        <a href="/news">НОВОСТИ</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="server-time">
+    Текущее время сервера: <span id="serverTime" th:text="${serverTime}">—</span>
+  </div>
+
+  <main class="content">
+    <div class="news-page-wrapper">
+      <div class="news-header-section">
+        <h1>НОВОСТИ</h1>
+        <div th:if="${session.user != null and (session.user.role == 'admin' or session.user.role == 'moderator')}">
+          <a class="button add-news-btn" th:href="@{/news/create}">Добавить новость</a>
+        </div>
+      </div>
+
+      <div class="auth__success" th:if="${success}" th:text="${success}"></div>
+      <div class="auth__error" th:if="${error}" th:text="${error}"></div>
+
+      <div th:if="${newsList != null and !newsList.isEmpty()}">
+        <div th:each="news : ${newsList}" class="news-card-item">
+          <div class="news-card-title" th:text="${news.title}"></div>
+          <div class="news-card-content" th:text="${news.content}"></div>
+
+          <div class="news-card-meta">
+            <div>
+              Автор: <span th:text="${news.author.name}"></span>
+            </div>
+            <div>
+              Опубликовано: <span th:text="${#temporals.format(news.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+            </div>
+          </div>
+
+          <div class="news-card-actions" th:if="${session.user != null}">
+            <a th:if="${session.user.role == 'admin' or session.user.role == 'moderator' or news.author.id == session.user.id}"
+               class="news-btn"
+               th:href="@{/news/edit/{id}(id=${news.id})}">Редактировать</a>
+
+            <form th:if="${session.user.role == 'admin' or session.user.role == 'moderator'}"
+                  th:action="@{/news/delete/{id}(id=${news.id})}"
+                  method="post"
+                  class="news-btn-form">
+              <button class="news-btn" type="submit"
+                      onclick="return confirm('Удалить эту новость?')">Удалить</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${newsList == null or newsList.isEmpty()}" class="news-empty-state">
+        Пока нет новостей.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Сайт разработали студенты группы 24ВП1 Гриднев Владислав и Пономарев Павел
+  </footer>
+</div>
+
+<script th:src="@{/js/time_fetcher.js}"></script>
+</body>
+</html>

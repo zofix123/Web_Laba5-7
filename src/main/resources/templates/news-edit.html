@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Сайт знакомств - Редактирование новости</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="page">
+    <header class="header">
+        <div class="header__inner">
+            <div></div>
+            <div class="header__brand">
+                <a href="/main">САЙТ ЗНАКОМСТВ</a>
+            </div>
+            <nav class="header__nav">
+                <a href="/profile">ПРОФИЛЬ</a>
+                <a href="/news">НОВОСТИ</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="server-time">
+        Текущее время сервера: <span id="serverTime" th:text="${serverTime}">—</span>
+    </div>
+
+    <main class="content">
+        <section class="box auth">
+            <div class="auth__title">РЕДАКТИРОВАНИЕ НОВОСТИ</div>
+
+            <div class="auth__error" th:if="${error}" th:text="${error}"></div>
+            <div class="auth__success" th:if="${success}" th:text="${success}"></div>
+
+            <form th:action="@{/news/edit/{id}(id=${news.id})}" method="post" class="auth__form">
+                <div class="auth__inputs">
+                    <label>
+                        <input class="auth__input" type="text" name="title" th:value="${news.title}" required />
+                    </label>
+
+                    <label>
+                        <textarea class="auth__input" name="content" th:text="${news.content}"
+                                  rows="10" required style="resize: vertical; min-height: 150px;"></textarea>
+                    </label>
+                </div>
+
+                <div class="auth__actions">
+                    <button class="button" type="submit">СОХРАНИТЬ</button>
+                    <a class="button" th:href="@{/news}">ОТМЕНА</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Сайт разработали студенты группы 24ВП1 Гриднев Владислав и Пономарев Павел
+    </footer>
+</div>
+
+<script th:src="@{/js/time_fetcher.js}"></script>
+</body>
+</html>

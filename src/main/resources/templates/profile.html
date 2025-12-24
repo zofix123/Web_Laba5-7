@@ -18,6 +18,7 @@
 
             <nav class="header__nav">
                 <a href="/profile">ПРОФИЛЬ</a>
+                <a href="/news">НОВОСТИ</a>
             </nav>
         </div>
     </header>
@@ -183,6 +184,10 @@
                     </div>
                 </div>
             </section>
+            <a class="link"
+               th:if="${session.user.role == 'admin' or session.user.role == 'moderator'}"
+               th:href="@{/news}"
+            >Управление новостями</a>
         </div>
 
     </main>
