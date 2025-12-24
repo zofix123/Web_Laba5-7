@@ -15,8 +15,8 @@
                 <a href="/main">САЙТ ЗНАКОМСТВ</a>
             </div>
             <nav class="header__nav">
-                <a href="/profile">ПРОФИЛЬ</a>
                 <a href="/news">НОВОСТИ</a>
+                <a href="/profile">ПРОФИЛЬ</a>
             </nav>
         </div>
     </header>
@@ -39,12 +39,15 @@
                     </label>
 
                     <label>
-                        <textarea class="auth__input" name="content" th:text="${news.content}"
-                                  rows="10" required style="resize: vertical; min-height: 150px;"></textarea>
+            <textarea class="auth__input auth__textarea"
+                      name="content"
+                      rows="8"
+                      required
+                      th:text="${news.content}"></textarea>
                     </label>
                 </div>
 
-                <div class="auth__actions">
+                <div class="auth__actions auth__actions--row">
                     <button class="button" type="submit">СОХРАНИТЬ</button>
                     <a class="button" th:href="@{/news}">ОТМЕНА</a>
                 </div>

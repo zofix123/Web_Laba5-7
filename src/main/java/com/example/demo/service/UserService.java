@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.exception.EmailAlreadyExistsException;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.UserInteractionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,11 @@ public class UserService {
     // путь для сохранения файлов (относительный путь внутри проекта)
     private static final String UPLOAD_DIR = "uploads/";
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       UserInteractionRepository userInteractionRepository) {
         this.userRepository = userRepository;
-        // Создаем директорию при инициализации сервиса
+        this.userInteractionRepository = userInteractionRepository;
+
         try {
             createUploadDirectory();
         } catch (IOException e) {
@@ -38,6 +41,7 @@ public class UserService {
     }
 
     private final UserRepository userRepository;
+    private final UserInteractionRepository userInteractionRepository;
     // Метод для создания директории загрузок
     private void createUploadDirectory() throws IOException {
         Path uploadPath = getUploadPath();
@@ -85,10 +89,13 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new IllegalStateException("юзера с таким id " + id + " не существует");
         }
+
+        userInteractionRepository.deleteAllForUser(id);
         userRepository.deleteById(id);
     }
 

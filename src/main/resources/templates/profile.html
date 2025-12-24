@@ -17,8 +17,8 @@
             </div>
 
             <nav class="header__nav">
-                <a href="/profile">ПРОФИЛЬ</a>
                 <a href="/news">НОВОСТИ</a>
+                <a href="/profile">ПРОФИЛЬ</a>
             </nav>
         </div>
     </header>
@@ -143,7 +143,10 @@
 
                     <div class="profile__links">
                         <a class="link" th:href="@{/users/change-password}">Сменить пароль</a>
-
+                        <a class="link"
+                           th:if="${session.user.role == 'admin' or session.user.role == 'moderator'}"
+                           th:href="@{/news}"
+                        >Управление новостями</a>
                         <a class="link"
                            th:if="${session.user.role == 'admin'}"
                            th:href="@{/users/admin}"
@@ -184,10 +187,6 @@
                     </div>
                 </div>
             </section>
-            <a class="link"
-               th:if="${session.user.role == 'admin' or session.user.role == 'moderator'}"
-               th:href="@{/news}"
-            >Управление новостями</a>
         </div>
 
     </main>
