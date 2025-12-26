@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.InteractionType;
+import com.example.demo.repository.UserInteractionRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.InteractionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.Model;
@@ -23,11 +26,15 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final InteractionService interactionService;
+    private final UserInteractionRepository interactionRepository;
 
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService,
+                          InteractionService interactionService,
+                          UserInteractionRepository interactionRepository) {
         this.userService = userService;
-        this.userRepository = userRepository;
+        this.interactionService = interactionService;
+        this.interactionRepository = interactionRepository;
     }
 
     // GET для отображения страницы регистрации
@@ -189,7 +196,41 @@ public class UserController {
         return "Счетчик посещений пользователя " + user.getName() +
                 " увеличен. Текущее значение: " + user.getVisitCount();
     }
+    @GetMapping("/profile")
+    public String profilePage(HttpSession session, Model model) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/users/login";
+        }
+        return "profile";
+    }
 
+    @PostMapping("/profile")
+    public String updateProfile(@RequestParam String name,
+                                @RequestParam LocalDate birth,
+                                HttpSession session,
+                                Model model) {
+
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) return "redirect:/users/login";
+
+        try {
+            // Обновляем через сервис
+            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth);
+
+            // Обновляем пользователя в сессии
+            session.setAttribute("user", updatedUser);
+
+            model.addAttribute("success", "Данные профиля обновлены");
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при обновлении: " + e.getMessage());
+        }
+
+        List<User> likedUsers = interactionRepository.findTargetsByFromUserAndType(sessionUser.getId(), InteractionType.LIKE);
+
+        model.addAttribute("user", sessionUser);
+        model.addAttribute("likedUsers", likedUsers);
+        return "profile";
+    }
 
     // метод для отображения страницы загрузки аватара
     @GetMapping("/upload-avatar")
