@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Сайт знакомств - Создание новости</title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
 <div class="page">
@@ -12,11 +12,11 @@
         <div class="header__inner">
             <div></div>
             <div class="header__brand">
-                <a href="/main">САЙТ ЗНАКОМСТВ</a>
+                <a th:href="@{/main}">САЙТ ЗНАКОМСТВ</a>
             </div>
             <nav class="header__nav">
-                <a href="/news">НОВОСТИ</a>
-                <a href="/profile">ПРОФИЛЬ</a>
+                <a th:href="@{/news}">НОВОСТИ</a>
+                <a th:href="@{/profile}">ПРОФИЛЬ</a>
             </nav>
         </div>
     </header>
