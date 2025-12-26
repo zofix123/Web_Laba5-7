@@ -41,8 +41,8 @@
                 <div class="avatar-block">
                     <div class="avatar-block__preview">
                         <img id="avatarPreview"
-                             th:if="${session.user.avatar != null and !#strings.isEmpty(session.user.avatar)}"
-                             th:src="${session.user.avatar}"
+                             th:if="${session.user != null and session.user.avatar != null and !#strings.isEmpty(session.user.avatar)}"
+                             th:src="@{${session.user.avatar}}"
                              alt="Аватар"
                              class="avatar-block__img" />
 

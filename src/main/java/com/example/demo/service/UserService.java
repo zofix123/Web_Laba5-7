@@ -5,6 +5,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.UserInteractionRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,19 +26,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    // путь для сохранения файлов (относительный путь внутри проекта)
-    private static final String UPLOAD_DIR = "uploads/";
+    @Value("${upload.dir}") // Добавьте это!
+    private String uploadDir;
 
     public UserService(UserRepository userRepository,
                        UserInteractionRepository userInteractionRepository) {
         this.userRepository = userRepository;
         this.userInteractionRepository = userInteractionRepository;
 
-        try {
-            createUploadDirectory();
-        } catch (IOException e) {
-            throw new RuntimeException("Не удалось создать директорию для загрузок", e);
-        }
     }
 
     private final UserRepository userRepository;
@@ -52,14 +48,13 @@ public class UserService {
 
     // Получение абсолютного пути к директории загрузок
     private Path getUploadPath() {
-        // Получаем текущую рабочую директорию (корень проекта)
-        String currentDir = System.getProperty("user.dir");
-        return Paths.get(currentDir, UPLOAD_DIR);
+        return Paths.get(uploadDir);
     }
 
     // Получение веб-пути для доступа к файлу
     private String getWebPath(String filename) {
-        return "/" + UPLOAD_DIR + filename;
+
+        return "/uploads/" + filename;
     }
 
     public List<User> findAll() {
@@ -105,6 +100,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
 
+        // Получаем путь к директории загрузок из конфигурации
+        Path uploadPath = Paths.get(uploadDir);
         // Проверяем, что файл не пустой
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Файл не должен быть пустым");
@@ -119,8 +116,6 @@ public class UserService {
             throw new IllegalArgumentException("Поддерживаются только изображения JPG, PNG и GIF");
         }
 
-        // Получаем путь к директории загрузок
-        Path uploadPath = getUploadPath();
 
         // Генерируем уникальное имя файла
         String originalFilename = file.getOriginalFilename();
@@ -135,7 +130,7 @@ public class UserService {
         Files.copy(file.getInputStream(), filePath);
 
         // Получаем веб-путь для сохранения в БД
-        String avatarPath = getWebPath(newFilename);
+        String avatarPath = "/uploads/" + newFilename;
 
         // Удаляем старый аватар, если он существует
         if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {

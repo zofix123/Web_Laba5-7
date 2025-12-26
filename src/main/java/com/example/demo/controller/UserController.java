@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.Model;
 import com.example.demo.entity.User;
@@ -21,9 +23,11 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     // GET для отображения страницы регистрации
@@ -202,7 +206,8 @@ public class UserController {
     @PostMapping("/upload-avatar")
     public String uploadAvatar(@RequestParam("avatarFile") MultipartFile file,
                                HttpSession session,
-                               Model model) {
+                               Model model,
+                               HttpServletRequest request) {
         if (session.getAttribute("user") == null) {
             return "redirect:/users/login";
         }
@@ -217,8 +222,6 @@ public class UserController {
 
             // Сохраняем аватар и получаем обновленного пользователя
             User updatedUser = userService.saveAvatar(sessionUser.getId(), file);
-
-            // Обновляем пользователя в сессии
             session.setAttribute("user", updatedUser);
             model.addAttribute("success", "Аватар успешно загружен");
 

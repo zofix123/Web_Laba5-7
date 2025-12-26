@@ -44,7 +44,7 @@
 
           <div class="news-card__image"
                th:if="${n.imagePath != null and !#strings.isEmpty(n.imagePath)}">
-            <img th:src="${n.imagePath}" alt="Изображение новости" />
+            <img th:src="@{${n.imagePath}}" alt="Изображение новости" />
           </div>
 
           <div class="news-card__content" th:text="${n.content}"></div>
