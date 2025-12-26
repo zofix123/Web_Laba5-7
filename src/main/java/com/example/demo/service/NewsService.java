@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.entity.News;
 import com.example.demo.entity.User;
 import com.example.demo.repository.NewsRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,32 +22,29 @@ import java.util.UUID;
 public class NewsService {
 
     private final NewsRepository newsRepository;
-    private static final String NEWS_UPLOAD_DIR = "uploads/news/";
+
+    @Value("${upload.dir}")
+    private String uploadDir;
 
     public NewsService(NewsRepository newsRepository) {
         this.newsRepository = newsRepository;
-        // Создаем директорию при инициализации сервиса
-        try {
-            createNewsUploadDirectory();
-        } catch (IOException e) {
-            throw new RuntimeException("Не удалось создать директорию для загрузок новостей", e);
-        }
     }
 
-    private void createNewsUploadDirectory() throws IOException {
-        Path uploadPath = getNewsUploadPath();
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-    }
+    private Path getNewsUploadPath() throws IOException {
+        // Используем upload.dir из конфигурации + подпапка news
+        Path newsPath = Paths.get(uploadDir, "news");
 
-    private Path getNewsUploadPath() {
-        String currentDir = System.getProperty("user.dir");
-        return Paths.get(currentDir, NEWS_UPLOAD_DIR);
+        // Создаем директорию если не существует
+        if (!Files.exists(newsPath)) {
+            Files.createDirectories(newsPath);
+        }
+
+        return newsPath;
     }
 
     private String getNewsWebPath(String filename) {
-        return "/" + NEWS_UPLOAD_DIR + filename;
+        // Путь должен совпадать с WebConfig
+        return "/uploads/news/" + filename;
     }
 
     private String saveNewsImage(MultipartFile file) throws IOException {
@@ -76,7 +75,7 @@ public class NewsService {
 
         // Сохраняем файл
         Path filePath = uploadPath.resolve(newFilename);
-        Files.copy(file.getInputStream(), filePath);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         // Возвращаем веб-путь
         return getNewsWebPath(newFilename);
@@ -85,6 +84,7 @@ public class NewsService {
     private void deleteNewsImage(String imagePath) {
         if (imagePath != null && !imagePath.isEmpty()) {
             try {
+                // Извлекаем имя файла из пути
                 String filename = imagePath.substring(imagePath.lastIndexOf("/") + 1);
                 Path filePath = getNewsUploadPath().resolve(filename);
                 Files.deleteIfExists(filePath);
