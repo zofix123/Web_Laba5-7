@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Сайт знакомств - главная</title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
 <div class="page">
@@ -13,12 +13,12 @@
             <div></div>
 
             <div class="header__brand">
-                <a href="/main">САЙТ ЗНАКОМСТВ</a>
+                <a th:href="@{/main}">САЙТ ЗНАКОМСТВ</a>
             </div>
 
             <nav class="header__nav">
-                <a href="/news">НОВОСТИ</a>
-                <a href="/profile">ПРОФИЛЬ</a>
+                <a th:href="@{/news}">НОВОСТИ</a>
+                <a th:href="@{/profile}">ПРОФИЛЬ</a>
             </nav>
         </div>
     </header>
@@ -55,8 +55,8 @@
         <section class="card" th:if="${candidate != null}">
             <div class="card__photo">
                 <img
-                        th:if="${candidate.avatar != null and !#strings.isEmpty(candidate.avatar)}"
-                        th:src="${candidate.avatar}"
+                        th:if="${candidate.avatar != null}"
+                        th:src="@{${candidate.avatar}}"
                         alt="Фото"
                         style="width:100%; height:100%; object-fit:cover;"
                 />
@@ -78,7 +78,7 @@
                     <input type="hidden" name="candidateId" th:value="${candidate.id}">
                     <button class="icon-button" type="submit" aria-label="Лайк"
                             th:disabled="${session.user == null}">
-                        <img src="/img/like.png" alt="" />
+                        <img th:src="@{/img/like.png}" alt="" />
                     </button>
                 </form>
 
@@ -86,7 +86,7 @@
                     <input type="hidden" name="candidateId" th:value="${candidate.id}">
                     <button class="icon-button" type="submit" aria-label="Дизлайк"
                             th:disabled="${session.user == null}">
-                        <img src="/img/dislike.png" alt="" />
+                        <img th:src="@{/img/dislike.png}" alt="" />
                     </button>
                 </form>
             </div>
@@ -103,7 +103,7 @@
     </footer>
 </div>
 <div id="toast" class="toast" aria-live="polite"></div>
-<script src="/js/time_fetcher.js"></script>
-<script src="/js/notifications.js"></script>
+<script th:src="@{/js/time_fetcher.js}"></script>
+<script th:src="@{/js/notifications.js}"></script>
 </body>
 </html>
