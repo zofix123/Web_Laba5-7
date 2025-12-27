@@ -32,19 +32,54 @@
             <div class="auth__error" th:if="${error}" th:text="${error}"></div>
             <div class="auth__success" th:if="${success}" th:text="${success}"></div>
 
-            <form th:action="@{/news/edit/{id}(id=${news.id})}" method="post" class="auth__form">
+            <form th:action="@{/news/edit/{id}(id=${news.id})}"
+                  method="post"
+                  class="auth__form"
+                  enctype="multipart/form-data">
                 <div class="auth__inputs">
                     <label>
                         <input class="auth__input" type="text" name="title" th:value="${news.title}" required />
                     </label>
 
                     <label>
-            <textarea class="auth__input auth__textarea"
-                      name="content"
-                      rows="8"
-                      required
-                      th:text="${news.content}"></textarea>
+                        <textarea class="auth__input auth__textarea"
+                                  name="content"
+                                  rows="8"
+                                  required
+                                  th:text="${news.content}"></textarea>
                     </label>
+
+                    <!-- Текущее изображение (если есть) -->
+                    <div class="news-upload" th:if="${news.imagePath != null and !#strings.isEmpty(news.imagePath)}">
+                        <div class="news-upload__label">Текущее изображение</div>
+
+                        <div class="news-upload__current">
+                            <img th:src="${news.imagePath}" alt="Текущее изображение" />
+                        </div>
+
+                        <label class="news-upload__remove">
+                            <input type="checkbox" name="removeImage" value="true" />
+                            <span>Удалить изображение</span>
+                        </label>
+                    </div>
+
+                    <!-- Загрузка нового изображения -->
+                    <div class="news-upload">
+                        <div class="news-upload__label">Загрузить новое (необязательно)</div>
+
+                        <input class="auth__input auth__file"
+                               type="file"
+                               id="imageFile"
+                               name="imageFile"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               onchange="previewImage(event)" />
+
+                        <div class="news-upload__note">JPG, PNG, GIF, WebP</div>
+
+                        <div class="news-upload__preview" id="imagePreview" style="display:none;">
+                            <img id="previewImage" alt="Предпросмотр" />
+                        </div>
+                    </div>
                 </div>
 
                 <div class="auth__actions auth__actions--row">
@@ -61,5 +96,6 @@
 </div>
 
 <script th:src="@{/js/time_fetcher.js}"></script>
+<script th:src="@{/js/previewImage.js}"></script>
 </body>
 </html>

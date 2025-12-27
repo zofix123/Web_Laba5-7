@@ -1,8 +1,15 @@
-function openEditModal(id, name, email, birth, role) {
+function openEditModal(id, name, email, birth, role, gender, city) {
     document.getElementById('editName').value = name || '';
     document.getElementById('editEmail').value = email || '';
     document.getElementById('editBirth').value = birth || '';
     document.getElementById('editRole').value = role || 'user';
+
+    const g = gender || 'MALE';
+    const genderSelect = document.getElementById('editGender');
+    if (genderSelect) genderSelect.value = g;
+
+    const cityInput = document.getElementById('editCity');
+    if (cityInput) cityInput.value = city || '';
 
     document.getElementById('editForm').action = '/users/admin/update/' + id;
 
@@ -23,7 +30,9 @@ function openEditModalFromData(btn) {
         btn.getAttribute('data-name'),
         btn.getAttribute('data-email'),
         btn.getAttribute('data-birth'),
-        btn.getAttribute('data-role')
+        btn.getAttribute('data-role'),
+        btn.getAttribute('data-gender'),
+        btn.getAttribute('data-city')
     );
 }
 

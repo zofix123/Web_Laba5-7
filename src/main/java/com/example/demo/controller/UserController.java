@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.Model;
 import com.example.demo.entity.User;
+import com.example.demo.entity.Gender;
 import com.example.demo.exception.EmailAlreadyExistsException;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -50,6 +51,8 @@ public class UserController {
                          @RequestParam String password,
                          @RequestParam String confirmPassword,
                          @RequestParam String birth,
+                         @RequestParam String gender,
+                         @RequestParam String city,
                          HttpSession session,
                          Model model) {
 
@@ -58,6 +61,8 @@ public class UserController {
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("birth", birth);
+            model.addAttribute("city", city);
+            model.addAttribute("gender", gender);
             model.addAttribute("error", "Пароль должен содержать минимум 4 символа");
             return "register";
         }
@@ -67,6 +72,8 @@ public class UserController {
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("birth", birth);
+            model.addAttribute("city", city);
+            model.addAttribute("gender", gender);
             model.addAttribute("error", "Пароли не совпадают");
             return "register";
         }
@@ -78,6 +85,10 @@ public class UserController {
             user.setEmail(email);
             user.setPassword(password);
             user.setBirth(java.time.LocalDate.parse(birth));
+            user.setGender(Gender.valueOf(gender));
+            user.setCity(city);
+            System.out.println("Gender: " + gender);
+            System.out.println("City: " + city);
 
             User saved = userService.create(user);
             session.setAttribute("user", saved);
@@ -86,12 +97,16 @@ public class UserController {
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("birth", birth);
+            model.addAttribute("city", city);
+            model.addAttribute("gender", gender);
             model.addAttribute("error", "Пользователь с такой почтой уже существует");
             return "register";
         } catch (IllegalArgumentException e) {
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("birth", birth);
+            model.addAttribute("city", city);
+            model.addAttribute("gender", gender);
             model.addAttribute("error", e.getMessage());
             return "register";
         }
@@ -150,6 +165,8 @@ public class UserController {
                                  @RequestParam String confirmNewPassword,
                                  HttpSession session,
                                  Model model) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) return "redirect:/users/login";
 
         try {
             User user = userService.changePassword(userId, oldPassword, newPassword, confirmNewPassword);
@@ -207,6 +224,8 @@ public class UserController {
     @PostMapping("/profile")
     public String updateProfile(@RequestParam String name,
                                 @RequestParam LocalDate birth,
+                                @RequestParam(required = false) String gender,
+                                @RequestParam(required = false) String city,
                                 HttpSession session,
                                 Model model) {
 
@@ -215,7 +234,7 @@ public class UserController {
 
         try {
             // Обновляем через сервис
-            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth);
+            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth, gender, city);
 
             // Обновляем пользователя в сессии
             session.setAttribute("user", updatedUser);
@@ -363,6 +382,8 @@ public class UserController {
                                     @RequestParam(required = false) String email,
                                     @RequestParam(required = false) String birth,
                                     @RequestParam(required = false) String role,
+                                    @RequestParam(required = false) String gender,
+                                    @RequestParam(required = false) String city,
                                     HttpSession session,
                                     RedirectAttributes redirectAttributes) {
         User currentUser = (User) session.getAttribute("user");
@@ -376,7 +397,7 @@ public class UserController {
                 birthDate = LocalDate.parse(birth);
             }
 
-            userService.updateUserByAdmin(id, name, email, birthDate, role);
+            userService.updateUserByAdmin(id, name, email, birthDate, role, gender, city);
             redirectAttributes.addFlashAttribute("success", "Данные пользователя обновлены");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при обновлении: " + e.getMessage());

@@ -108,6 +108,29 @@
                         <div class="profile-field__check"></div>
                     </div>
 
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="gender">Пол</label>
+                        <select class="profile-field__input" id="gender" name="gender">
+                            <option value="MALE" th:selected="${session.user.gender != null and session.user.gender.name() == 'MALE'}">Мужской</option>
+                            <option value="FEMALE" th:selected="${session.user.gender != null and session.user.gender.name() == 'FEMALE'}">Женский</option>
+                            <option value="OTHER" th:selected="${session.user.gender == null or session.user.gender.name() == 'OTHER'}">Другое</option>
+                        </select>
+                        <div class="profile-field__check"></div>
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-field__name" for="city">Город</label>
+                        <input
+                                class="profile-field__input"
+                                id="city"
+                                name="city"
+                                type="text"
+                                th:value="${session.user.city}"
+                                placeholder="Город"
+                        />
+                        <div class="profile-field__check"></div>
+                    </div>
+
                     <!-- Возраст (read-only) -->
                     <div class="profile-field">
                         <label class="profile-field__name" for="age">Возраст</label>
