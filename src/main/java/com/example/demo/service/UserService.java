@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.exception.EmailAlreadyExistsException;
 import com.example.demo.entity.User;
+import com.example.demo.entity.Gender;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.UserInteractionRepository;
 import jakarta.transaction.Transactional;
@@ -68,6 +69,15 @@ public class UserService {
 
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("Пароль обязателен");
+        }
+
+        if (user.getGender() == null) {
+            throw new IllegalArgumentException("Пол обязателен");
+        }
+
+        if (user.getCity() != null) {
+            String c = user.getCity().trim();
+            user.setCity(c.isEmpty() ? null : c);
         }
 
         // Проверка длины пароля
@@ -152,22 +162,20 @@ public class UserService {
 
     @Transactional
     public void update(Long id, String email, String name, String password, String confirmPassword) {
-        if (!userRepository.existsById(id)) {
-            throw new IllegalStateException("юзера с таким id " + id + " не существует");
-        }
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("юзера с таким id " + id + " не существует"));
 
-        if (email != null && !email.equals(user.getEmail())) {
-            try {
-                user.setEmail(email);
-            }
-            catch (DataIntegrityViolationException e) {
+        if (email != null && !email.trim().isEmpty() && !email.equals(user.getEmail())) {
+            Optional<User> existing = userRepository.findByEmail(email);
+            if (existing.isPresent() && existing.get().getId() != id) {
                 throw new EmailAlreadyExistsException("Пользователь с такой почтой уже существует");
             }
+            user.setEmail(email);
         }
-        if (name != null && !name.equals(user.getName())) {
+        if (name != null && !name.trim().isEmpty() && !name.equals(user.getName())) {
             user.setName(name);
         }
+
         if (password != null && !password.trim().isEmpty()) {
             // Проверка длины при обновлении
             if (password.length() < 4) {
@@ -179,6 +187,7 @@ public class UserService {
             }
             user.setPassword(password);
         }
+        userRepository.save(user);
     }
 
     @Transactional
@@ -211,17 +220,30 @@ public class UserService {
     }
 
     @Transactional
-    public User updateProfile(Long userId, String name, LocalDate birth) {
+    public User updateProfile(Long userId, String name, LocalDate birth, String gender, String city) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
 
         if (name != null && !name.trim().isEmpty()) {
-            user.setName(name);
+            user.setName(name.trim());
         }
 
         if (birth != null) {
             user.setBirth(birth);
             user.setAge(Period.between(birth, LocalDate.now()).getYears());
+        }
+
+        if (gender != null && !gender.trim().isEmpty()) {
+            try {
+                user.setGender(Gender.valueOf(gender));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Некорректный пол");
+            }
+        }
+
+        if (city != null) {
+            city = city.trim();
+            user.setCity(city.isEmpty() ? null : city);
         }
 
         return userRepository.save(user);
@@ -282,7 +304,7 @@ public class UserService {
 
     // Метод для обновления пользователя (администратором)
     @Transactional
-    public User updateUserByAdmin(Long userId, String name, String email, LocalDate birth, String role) {
+    public User updateUserByAdmin(Long userId, String name, String email, LocalDate birth, String role, String gender, String city) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
 
@@ -310,6 +332,19 @@ public class UserService {
                 throw new IllegalArgumentException("Недопустимая роль: " + role);
             }
             user.setRole(role);
+        }
+
+        if (gender != null && !gender.trim().isEmpty()) {
+            try {
+                user.setGender(com.example.demo.entity.Gender.valueOf(gender));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Некорректный пол");
+            }
+        }
+
+        if (city != null) {
+            city = city.trim();
+            user.setCity(city.isEmpty() ? null : city);
         }
 
         return userRepository.save(user);

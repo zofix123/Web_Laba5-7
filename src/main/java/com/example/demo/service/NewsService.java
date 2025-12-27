@@ -118,7 +118,7 @@ public class NewsService {
     }
 
     @Transactional
-    public News updateNews(Long id, String title, String content, User updater, MultipartFile imageFile) throws IOException {
+    public News updateNews(Long id, String title, String content, User updater, MultipartFile imageFile, boolean removeImage) throws IOException {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Новость не найдена"));
 
@@ -137,8 +137,13 @@ public class NewsService {
         news.setContent(content);
         news.setUpdatedAt(LocalDateTime.now());
 
-        // Обновляем изображение, если новое загружено
-        if (imageFile != null && !imageFile.isEmpty()) {
+        // Обработка изображения
+        if (removeImage) {
+            // Удаляем изображение, если пользователь выбрал удалить
+            deleteNewsImage(news.getImagePath());
+            news.setImagePath(null);
+        } else if (imageFile != null && !imageFile.isEmpty()) {
+            // Обновляем изображение, если новое загружено
             // Удаляем старое изображение
             deleteNewsImage(news.getImagePath());
 

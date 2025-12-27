@@ -324,16 +324,23 @@ img {
     grid-template-rows: auto auto auto;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
+    row-gap: 6px;
 }
 
 .card__name {
     grid-row: 1;
+    grid-column: 1;
     justify-self: start;
     font-weight: 700;
-    font-size: 20px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 20px; }
+
+.card__city {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    justify-self: start;
+    font-weight: 500;
+    font-size: 16px;
+    opacity: 0.9;
 }
 
 .card__age {

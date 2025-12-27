@@ -70,6 +70,13 @@
                 <div class="card__meta-grid">
                     <div class="card__name" th:text="${candidate.name}">Имя</div>
                     <div class="card__age" th:text="${candidate.age} + ' лет'">18 лет</div>
+                    <div class="card__gender"
+                         th:text="${candidate.gender != null ? (candidate.gender.name() == 'MALE' ? 'Мужчина' : 'Женщина') : 'Пол не указан'}">
+                        Пол не указан
+                    </div>
+                    <div class="card__city"
+                         th:text="${candidate.city != null and !#strings.isEmpty(candidate.city) ? candidate.city : 'Город не указан'}">
+                        Город не указан</div>
                 </div>
             </div>
 

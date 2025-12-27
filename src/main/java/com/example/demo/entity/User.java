@@ -17,6 +17,11 @@ public class User {
     private String email;
     private LocalDate birth;
     private int age;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", columnDefinition = "VARCHAR(10)")
+    private Gender gender;
+    @Column(name = "city", length = 100)
+    private String city;
     private int visitCount = 1;
     @Column(nullable = false)
     private String password;
@@ -61,6 +66,14 @@ public class User {
     public int getAge() {
         return age;
     }
+
+    public Gender getGender() { return gender; }
+
+    public void setGender(Gender gender) { this.gender = gender; }
+
+    public String getCity() { return city; }
+
+    public void setCity(String city) { this.city = city; }
 
     public void setAge(int age) {
         this.age = age;

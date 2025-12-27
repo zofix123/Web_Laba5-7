@@ -114,13 +114,7 @@ public class NewsController {
         }
 
         try {
-            News updatedNews;
-            if (removeImage) {
-                // Создаем пустой MultipartFile для удаления изображения
-                updatedNews = newsService.updateNews(id, title, content, user, null);
-            } else {
-                updatedNews = newsService.updateNews(id, title, content, user, imageFile);
-            }
+            newsService.updateNews(id, title, content, user, imageFile, removeImage);
             redirectAttributes.addFlashAttribute("success", "Новость успешно обновлена");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

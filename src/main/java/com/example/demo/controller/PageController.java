@@ -58,18 +58,18 @@ public class PageController {
     @PostMapping("/profile")
     public String updateProfile(@RequestParam String name,
                                 @RequestParam LocalDate birth,
+                                @RequestParam String gender,
+                                @RequestParam String city,
                                 HttpSession session,
                                 Model model) {
+
         addServerTimeToModel(model);
 
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser == null) return "redirect:/users/login";
 
         try {
-            // Обновляем через сервис
-            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth);
-
-            // Обновляем пользователя в сессии
+            User updatedUser = userService.updateProfile(sessionUser.getId(), name, birth, gender, city);
             session.setAttribute("user", updatedUser);
 
             model.addAttribute("success", "Данные профиля обновлены");

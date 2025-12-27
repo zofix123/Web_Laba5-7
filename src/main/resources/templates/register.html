@@ -59,7 +59,6 @@
                     th:value="${email != null ? email : ''}"
             />
           </label>
-
           <label>
             <input
                     class="auth__input"
@@ -72,9 +71,7 @@
                     minlength="4"
             />
           </label>
-
           <div id="password-strength" class="auth__help"></div>
-
           <label>
             <input
                     class="auth__input"
@@ -89,6 +86,26 @@
           </label>
 
           <div id="password-match" class="auth__help"></div>
+
+          <label>
+            <select class="auth__input" name="gender" required>
+              <option value="" disabled selected>Пол</option>
+              <option value="MALE">Мужской</option>
+              <option value="FEMALE">Женский</option>
+            </select>
+          </label>
+
+          <label>
+            <input
+                    class="auth__input"
+                    type="text"
+                    name="city"
+                    placeholder="Город"
+                    autocomplete="address-level2"
+                    required
+                    th:value="${city != null ? city : ''}"
+            />
+          </label>
 
           <label>
             <input

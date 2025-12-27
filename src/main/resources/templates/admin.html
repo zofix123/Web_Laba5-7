@@ -57,6 +57,8 @@
               <th>Имя</th>
               <th>Email</th>
               <th>Рожд.</th>
+              <th>Пол</th>
+              <th>Город</th>
               <th>Возраст</th>
               <th>Роль</th>
               <th>Визиты</th>
@@ -69,6 +71,8 @@
               <td th:text="${u.name}">Имя</td>
               <td th:text="${u.email}">mail</td>
               <td th:text="${u.birth}">2000-01-01</td>
+              <td th:text="${u.gender != null ? u.gender : '—'}">—</td>
+              <td th:text="${u.city != null ? u.city : '—'}">—</td>
               <td th:text="${u.age}">18</td>
 
               <td>
@@ -97,6 +101,8 @@
                         th:attr="data-id=${u.id},
                                                  data-name=${u.name},
                                                  data-email=${u.email},
+                                                 data-gender=${u.gender},
+                                                 data-city=${u.city},
                                                  data-birth=${#temporals.format(u.birth,'yyyy-MM-dd')},
                                                  data-role=${u.role}"
                         onclick="openEditModalFromData(this)">
@@ -140,6 +146,20 @@
             <label class="modal-field">
               <span class="modal-field__label">Email</span>
               <input class="modal-field__input" type="email" id="editEmail" name="email">
+            </label>
+
+            <label class="modal-field">
+              <span class="modal-field__label">Пол</span>
+              <select class="modal-field__input" id="editGender" name="gender">
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+                <option value="OTHER">OTHER</option>
+              </select>
+            </label>
+
+            <label class="modal-field">
+              <span class="modal-field__label">Город</span>
+              <input class="modal-field__input" type="text" id="editCity" name="city">
             </label>
 
             <label class="modal-field">
